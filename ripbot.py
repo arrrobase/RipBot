@@ -1,6 +1,6 @@
 from __future__ import print_function
 
-from groupy import Bot
+from groupy import Bot, config
 from flask import Flask, request
 
 import json
@@ -26,6 +26,8 @@ class GroupMeBot(object):
 
 
 if __name__ == '__main__':
+    config.KEY_LOCATION = '.groupy.key'
+
     which_bot = 'ripbot'
     bot = Bot.list().filter(name=which_bot)[0]
 
