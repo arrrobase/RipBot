@@ -22,7 +22,6 @@ class GroupMeBot(object):
         Method to send responses on callbacks.
         """
         data = json.loads(request.data.decode('utf8'))
-        print('it worked!')
         self.post('did it work?')
 
 
@@ -34,6 +33,6 @@ if __name__ == '__main__':
 
     ripbot = GroupMeBot(bot.post)
 
-    app.route('/', methods=['POST'])(ripbot.callback)
+    app.route('/groupme', methods=['POST'])(ripbot.callback)
     port = int(os.environ.get('PORT', 5000))
     app.run('0.0.0.0', port=port)
