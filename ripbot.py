@@ -24,13 +24,28 @@ class GroupMeBot(object):
         """
         data = json.loads(request.data.decode('utf8'))
 
-        if 'name' in data and data['name'] != 'ripbot':
+        name = None
+        text = None
+
+        if 'name' in data:
+            name = data['name']
+
+        if 'text' in data:
+            text = data['text']
+
+        if name is not None and name != 'ripbot':
+            log.info('Got user message, parsing...')
             self.post('got it')
 
-            if 'text' in data:
-                plusplus = re.match('^@(.*?)\+\+', data['text']).group(1)
+            if text is not None:
+                plusplus = re.match('^@(.*?)\+\+', text).group(1)
                 if plusplus is not None:
-                    self.post(plusplus.rstrip())
+                    points_to = plusplus.rstrip()
+                    log.info('MATCH: plusplus to {} in {}'.format(points_to,
+                                                                  text))
+                    self.post(points_to)
+
+        return 'OK'
 
 
 if __name__ == '__main__':
