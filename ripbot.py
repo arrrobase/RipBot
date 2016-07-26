@@ -4,6 +4,7 @@ from groupy import Bot, config
 from flask import Flask, request
 
 import json
+import os
 
 app = Flask(__name__)
 log = app.logger
@@ -34,4 +35,5 @@ if __name__ == '__main__':
     ripbot = GroupMeBot(bot.post)
 
     app.route('/', methods=['POST'])(ripbot.callback)
-    app.run('0.0.0.0', port=5000)
+    port = int(os.environ.get('PORT', 5000))
+    app.run('0.0.0.0', port=port)
