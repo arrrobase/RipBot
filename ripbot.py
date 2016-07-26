@@ -20,6 +20,7 @@ class GroupMeBot(object):
         """
         data = json.loads(request.data.decode('utf8'))
         self.post('did it work?')
+        print 'it worked!'
 
 
 if __name__ == '__main__':
