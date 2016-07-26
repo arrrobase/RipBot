@@ -38,9 +38,9 @@ class GroupMeBot(object):
             self.post('no')
 
             if text is not None:
-                plusplus = re.match('^@(.*?)\+\+', text).group(1)
+                plusplus = re.match('^@(.*?)\+\+', text)
                 if plusplus is not None:
-                    points_to = plusplus.rstrip()
+                    points_to = plusplus.group(1).rstrip()
                     log.info('MATCH: plusplus to {} in {}'.format(points_to,
                                                                   text))
                     self.post(points_to)
