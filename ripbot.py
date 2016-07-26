@@ -39,7 +39,7 @@ class GroupMeBot(object):
             text = data['text']
 
         if 'system' in data:
-            text = data['system']
+            system = data['system']
 
         if name is not None and name != 'ripbot':
             log.info('Got user message, parsing...')
