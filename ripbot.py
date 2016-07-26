@@ -35,7 +35,7 @@ class GroupMeBot(object):
 
         if name is not None and name != 'ripbot':
             log.info('Got user message, parsing...')
-            self.post('got it')
+            self.post('no')
 
             if text is not None:
                 plusplus = re.match('^@(.*?)\+\+', text).group(1)
