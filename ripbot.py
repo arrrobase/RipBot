@@ -1,6 +1,6 @@
 from __future__ import print_function
 
-from groupy import Bot, config
+from groupy import Bot, Group, config
 from flask import Flask, request
 import logging
 
@@ -30,6 +30,7 @@ class GroupMeBot(object):
 
         name = None
         text = None
+        system = None
 
         if 'name' in data:
             name = data['name']
@@ -37,9 +38,11 @@ class GroupMeBot(object):
         if 'text' in data:
             text = data['text']
 
+        if 'system' in data:
+            text = data['system']
+
         if name is not None and name != 'ripbot':
             log.info('Got user message, parsing...')
-            self.post('no')
 
             if text is not None:
                 plusplus = re.match('^@(.*?)\+\+', text)
@@ -50,7 +53,7 @@ class GroupMeBot(object):
                     if len(points_to) > 0:
                         log.info('MATCH: plusplus to {} in {}'.format(points_to,
                                                                       text))
-                        self.post(points_to)
+                        self.post(points_to + str(member_dict[points_to]))
 
         return 'OK'
 
@@ -62,6 +65,12 @@ if __name__ == '__main__':
     bot = Bot.list().filter(name=which_bot)[0]
 
     ripbot = GroupMeBot(bot.post)
+
+    which_group = 'bot_Test'
+    group = Group.list().filter(name=which_group)[0]
+    member_dict = {}
+    for member in group.members():
+        member_dict[member.nickname] = int(member.user_id)
 
     app.route('/groupme', methods=['POST'])(ripbot.callback)
     port = int(os.environ.get('PORT', 5000))
