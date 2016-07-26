@@ -19,7 +19,7 @@ class GroupMeBot(object):
         Method to send responses on callbacks.
         """
         data = json.loads(request.data.decode('utf8'))
-        print data
+        self.post('did it work?')
 
 
 if __name__ == '__main__':
