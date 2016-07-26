@@ -22,7 +22,9 @@ class GroupMeBot(object):
         Method to send responses on callbacks.
         """
         data = json.loads(request.data.decode('utf8'))
-        self.post('did it work?')
+
+        if 'name' in data and data['name'] != 'ripbot':
+            self.post('did it work?')
 
 
 if __name__ == '__main__':
