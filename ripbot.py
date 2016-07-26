@@ -1,3 +1,5 @@
+from __future__ import print_function
+
 from groupy import Bot
 from flask import Flask, request
 
@@ -20,7 +22,7 @@ class GroupMeBot(object):
         """
         data = json.loads(request.data.decode('utf8'))
         self.post('did it work?')
-        print 'it worked!'
+        print('it worked!')
 
 
 if __name__ == '__main__':
