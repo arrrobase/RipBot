@@ -5,6 +5,7 @@ from flask import Flask, request
 
 import json
 import os
+import re
 
 app = Flask(__name__)
 log = app.logger
@@ -24,7 +25,12 @@ class GroupMeBot(object):
         data = json.loads(request.data.decode('utf8'))
 
         if 'name' in data and data['name'] != 'ripbot':
-            self.post('did it work?')
+            self.post('got it')
+
+            if 'text' in data:
+                plusplus = re.match('^@(.*?)\+\+', data['text']).group(1)
+                if plusplus is not None:
+                    self.post(plusplus.rstrip())
 
 
 if __name__ == '__main__':
