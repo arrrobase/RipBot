@@ -26,7 +26,7 @@ class GroupMeBot(object):
 
 
 if __name__ == '__main__':
-    config.KEY_LOCATION = '.groupy.key'
+    config.API_KEY = 'Obswbyyf83EViCprfCOJHER8XbhMCd0Up99c3FBj'
 
     which_bot = 'ripbot'
     bot = Bot.list().filter(name=which_bot)[0]
