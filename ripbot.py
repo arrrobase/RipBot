@@ -1,7 +1,8 @@
 from __future__ import print_function
 
 from groupy import Bot, config
-from flask import Flask, request, logging
+from flask import Flask, request
+import logging
 
 import json
 import sys
@@ -11,6 +12,7 @@ import re
 app = Flask(__name__)
 log = app.logger
 log.addHandler(logging.StreamHandler(sys.stdout))
+log.setLevel(logging.INFO)
 
 
 class GroupMeBot(object):
