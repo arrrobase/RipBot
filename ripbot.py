@@ -357,12 +357,11 @@ class Rip_DB(object):
         try:
             self.cur.execute(sql.format(id))
             ret = self.cur.fetchone()
-            print(repr(ret))
 
             if ret is None:
-                return True
-            else:
                 return False
+            else:
+                return True
 
         except psycopg2.DatabaseError as e:
             log.error(e)
