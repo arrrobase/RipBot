@@ -4,7 +4,7 @@ from groupy import Bot, Group, config
 from flask import Flask, request
 import logging
 
-import urlparse
+import urllib.parse as urlparse
 import psycopg2
 import json
 import sys
