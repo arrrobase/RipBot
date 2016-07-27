@@ -31,6 +31,16 @@ class GroupMeBot(object):
         """
         data = json.loads(request.data.decode('utf8'))
 
+        self.parse_and_post(data)
+
+        return 'OK'
+
+    def parse_and_post(self, data):
+        """
+        Parses callback JSON data and selects appropriate response.
+        :param data: data from groupme server
+        """
+
         name = None
         text = None
         system = None
@@ -44,7 +54,16 @@ class GroupMeBot(object):
         if 'system' in data:
             system = data['system']
 
-        if name is not None and name != 'ripbot':
+        if system:
+            log.info('Got system message, parsing...')
+
+            if text is not None:
+                new_user = re.match('(.*?) added (.*?) to the group', text)
+
+                if new_user is not None:
+                    self.is_new_user(new_user)
+
+        elif name is not None and name != 'ripbot':
             log.info('Got user message, parsing...')
 
             if text is not None:
@@ -52,39 +71,71 @@ class GroupMeBot(object):
                 minusminus = re.match('^@(.*?) \-\- (.*)', text)
 
                 if plusplus is not None:
-                    points_to = plusplus.group(1)
-                    what_for = plusplus.group(2).lstrip('for ')
-
-                    if len(points_to) > 0:
-                        log.info('MATCH: plusplus to {} in {}'.format(points_to,
-                                                                      text))
-
-                        rip_db.add_point(points_to)
-                        points = rip_db.get_player_points(points_to)
-                        post_text = '{} now has {} point(s), ' \
-                                    'most recently for {}.'.format(points_to,
-                                                                   points,
-                                                                   what_for)
-
-                        self.post(post_text)
+                    self.is_plusplus(plusplus, text)
 
                 if minusminus is not None:
-                    points_to = minusminus.group(1)
-                    what_for = minusminus.group(2).lstrip('for ')
+                    self.is_minusminus(minusminus, text)
 
-                    if len(points_to) > 0:
-                        log.info('MATCH: minusminus to {} in {}'.format(points_to,
-                                                                      text))
+    def is_plusplus(self, match, text):
+        """
+        Response for adding points
+        :param match: re match groups
+        :param text: message text
+        """
+        points_to = match.group(1)
+        what_for = match.group(2).lstrip('for ')
 
-                        rip_db.sub_point(points_to)
-                        points = rip_db.get_player_points(points_to)
-                        post_text = '{} now has {} points, ' \
-                                    'most recently for {}.'.format(points_to,
-                                                                   points, what_for)
+        if len(points_to) > 0:
+            log.info('MATCH: plusplus to {} in {}.'.format(points_to,
+                                                          text))
 
-                        self.post(post_text)
+            rip_db.add_point(points_to)
+            points = rip_db.get_player_points(points_to)
+            post_text = '{} now has {} point(s), ' \
+                        'most recently for {}.'.format(points_to,
+                                                       points,
+                                                       what_for)
 
-        return 'OK'
+            self.post(post_text)
+
+    def is_minusminus(self, match, text):
+        """
+        Response for subtracting points
+        :param match: re match groups
+        :param text: message text
+        """
+        points_to = match.group(1)
+        what_for = match.group(2).lstrip('for ')
+
+        if len(points_to) > 0:
+            log.info('MATCH: minusminus to {} in {}.'.format(points_to,
+                                                          text))
+
+            rip_db.sub_point(points_to)
+            points = rip_db.get_player_points(points_to)
+            post_text = '{} now has {} points, ' \
+                        'most recently for {}.'.format(points_to,
+                                                       points, what_for)
+
+            self.post(post_text)
+
+    def is_new_user(self, match):
+        """
+        Response to new user. Welcomes them and adds them to DB.
+        :param match: re match groups
+        """
+        user_name = match.group(2)
+        log.info('SYSTEM MATCH: new user detected.')
+
+        member = group.members().filter(name=user_name)[0]
+        id = member.user_id
+
+        # TODO: PROBLEM could add new user with ID number of existing,
+        # make a check etc.
+        rip_db.add_player(id, user_name)
+
+        post_text = 'Welcome {}. You have 0 points.'
+        self.post(post_text)
 
 
 # def set_up_db():
