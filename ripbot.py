@@ -48,11 +48,12 @@ class GroupMeBot(object):
             log.info('Got user message, parsing...')
 
             if text is not None:
-                plusplus = re.match('^@(.*?)\+\+', text)
-                minusminus = re.match('^@(.*?)\-\-', text)
+                plusplus =   re.match('^@(.*?) \+\+ (.*)', text)
+                minusminus = re.match('^@(.*?) \-\- (.*)', text)
 
                 if plusplus is not None:
-                    points_to = plusplus.group(1).rstrip()
+                    points_to = plusplus.group(1)
+                    what_for = plusplus.group(2).lstrip('for ')
 
                     if len(points_to) > 0:
                         log.info('MATCH: plusplus to {} in {}'.format(points_to,
@@ -60,13 +61,16 @@ class GroupMeBot(object):
 
                         rip_db.add_point(points_to)
                         points = rip_db.get_player_points(points_to)
-                        post_text = '{} now has {} points.'.format(points_to,
-                                                                   points)
+                        post_text = '{} now has {} point(s), ' \
+                                    'most recently for {}.'.format(points_to,
+                                                                   points,
+                                                                   what_for)
 
                         self.post(post_text)
 
                 if minusminus is not None:
-                    points_to = minusminus.group(1).rstrip()
+                    points_to = minusminus.group(1)
+                    what_for = minusminus.group(2).lstrip('for ')
 
                     if len(points_to) > 0:
                         log.info('MATCH: minusminus to {} in {}'.format(points_to,
@@ -74,8 +78,9 @@ class GroupMeBot(object):
 
                         rip_db.sub_point(points_to)
                         points = rip_db.get_player_points(points_to)
-                        post_text = '{} now has {} points.'.format(points_to,
-                                                                   points)
+                        post_text = '{} now has {} points, ' \
+                                    'most recently for {}.'.format(points_to,
+                                                                   points, what_for)
 
                         self.post(post_text)
 
