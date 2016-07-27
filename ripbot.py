@@ -67,8 +67,8 @@ class GroupMeBot(object):
             log.info('Got user message, parsing...')
 
             if text is not None:
-                plusplus =   re.match('^@(.*?) \+\+ (.*)', text)
-                minusminus = re.match('^@(.*?) \-\- (.*)', text)
+                plusplus =   re.match('^@(.*?) \+\+(.*)', text)
+                minusminus = re.match('^@(.*?) \-\-(.*)', text)
 
                 if plusplus is not None:
                     self.is_plusplus(plusplus, text)
@@ -83,7 +83,9 @@ class GroupMeBot(object):
         :param text: message text
         """
         points_to = match.group(1)
-        what_for = match.group(2).lstrip('for ')
+        what_for = match.group(2).lstrip(' for ')
+        if not what_for:
+            what_for = 'nothing'
 
         if len(points_to) > 0:
             log.info('MATCH: plusplus to {} in {}.'.format(points_to,
@@ -105,7 +107,9 @@ class GroupMeBot(object):
         :param text: message text
         """
         points_to = match.group(1)
-        what_for = match.group(2).lstrip('for ')
+        what_for = match.group(2).lstrip(' for ')
+        if not what_for:
+            what_for = 'nothing'
 
         if len(points_to) > 0:
             log.info('MATCH: minusminus to {} in {}.'.format(points_to,
