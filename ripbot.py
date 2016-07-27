@@ -131,15 +131,18 @@ class GroupMeBot(object):
         user_name = match.group(2)
         log.info('SYSTEM MATCH: new user detected.')
 
-        member = group.members().filter(name=user_name)[0]
-        id = member.user_id
+        print(repr(user_name))
+        print(repr(group.members()))
 
-        # TODO: PROBLEM could add new user with ID number of existing,
-        # make a check etc.
-        rip_db.add_player(id, user_name)
-
-        post_text = 'Welcome {}. You have 0 points.'
-        self.post(post_text)
+        # member = group.members().filter(name=user_name)[0]
+        # id = member.user_id
+        #
+        # # TODO: PROBLEM could add new user with ID number of existing,
+        # # make a check etc.
+        # rip_db.add_player(id, user_name)
+        #
+        # post_text = 'Welcome {}. You have 0 points.'
+        # self.post(post_text)
 
 
 # def set_up_db():
@@ -278,7 +281,7 @@ class Rip_DB(object):
                 cur_points = self.get_player_points(id)
                 self.cur.execute(sql.format(id))
                 self.con.commit()
-                log.info('Added point to {}; now has {} point(s).'.format(id,
+                log.info('ADD: point to {}; now has {} point(s).'.format(id,
                                                                           cur_points+1))
 
             except psycopg2.DatabaseError as e:
@@ -305,7 +308,7 @@ class Rip_DB(object):
                 cur_points = self.get_player_points(id)
                 self.cur.execute(sql.format(id))
                 self.con.commit()
-                log.info('Added point to {}; now has {} point(s).'.format(id,
+                log.info('SUB: point to {}; now has {} point(s).'.format(id,
                                                                           cur_points+1))
 
             except psycopg2.DatabaseError as e:
