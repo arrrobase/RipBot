@@ -48,6 +48,7 @@ class GroupMeBot(object):
 
             if text is not None:
                 plusplus = re.match('^@(.*?)\+\+', text)
+                minusminus = re.match('^@(.*?)\-\-', text)
 
                 if plusplus is not None:
                     points_to = plusplus.group(1).rstrip()
@@ -57,6 +58,20 @@ class GroupMeBot(object):
                                                                       text))
 
                         rip_db.add_point(points_to)
+                        points = rip_db.get_player_points(points_to)
+                        post_text = '{} now has {} points.'.format(points_to,
+                                                                   points)
+
+                        self.post(post_text)
+
+                if minusminus is not None:
+                    points_to = minusminus.group(1).rstrip()
+
+                    if len(points_to) > 0:
+                        log.info('MATCH: minusminus to {} in {}'.format(points_to,
+                                                                      text))
+
+                        rip_db.sub_point(points_to)
                         points = rip_db.get_player_points(points_to)
                         post_text = '{} now has {} points.'.format(points_to,
                                                                    points)
@@ -121,7 +136,7 @@ class Rip_DB(object):
                                         host=url.hostname,
                                         port=url.port
                                         )
-            log.info('Connect to database')
+            log.info('Successfully connected to database')
 
             self.cur = self.con.cursor()
 
@@ -165,7 +180,7 @@ class Rip_DB(object):
             try:
                 self.cur.execute(sql.format(id))
                 points = self.cur.fetchone()[0]
-                log.info('Fetched points of {} who has {} points.'.format(id,
+                log.info('Fetched points of {} who has {} point(s).'.format(id,
                                                                           points))
 
                 return points
@@ -192,6 +207,33 @@ class Rip_DB(object):
         if self.con is not None:
             try:
                 self.cur.execute(sql.format(id))
+                self.con.commit()
+                log.info('Added point to {}; now has {} point(s).'.format(id,
+                                                                         self.get_player_points(id)))
+
+            except psycopg2.DatabaseError as e:
+                self.con.rollback()
+                log.error(e)
+
+        else:
+            log.error('Failed adding points: not connected to DB.')
+
+    def sub_point(self, id):
+        """
+        Adds point to player by name or id.
+        :param id: player name or id
+        :return: players points as int
+        """
+        if type(id) == int:
+            sql = "UPDATE Ids SET points = points - 1 WHERE id={}"
+
+        else:
+            sql = "UPDATE Ids SET points = points - 1 WHERE name='{}'"
+
+        if self.con is not None:
+            try:
+                self.cur.execute(sql.format(id))
+                self.con.commit()
                 log.info('Added point to {}; now has {} point(s).'.format(id,
                                                                          self.get_player_points(id)))
 
