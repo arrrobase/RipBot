@@ -131,16 +131,19 @@ class GroupMeBot(object):
         user_name = match.group(2)
         log.info('SYSTEM MATCH: new user detected.')
 
-        member = Group.list().filter(name=which_group)[0].members().filter(
-            name=user_name)[0]
-        id = member.user_id
+        print(repr(user_name))
+        print(Group.list().filter(name=which_group)[0].members())
 
-        # TODO: PROBLEM could add new user with ID number of existing,
-        # make a check etc.
-        rip_db.add_player(id, user_name)
-
-        post_text = 'Welcome {}. You have 0 points.'
-        self.post(post_text)
+        # member = Group.list().filter(name=which_group)[0].members().filter(
+        #     name=user_name)[0]
+        # id = member.user_id
+        #
+        # # TODO: PROBLEM could add new user with ID number of existing,
+        # # make a check etc.
+        # rip_db.add_player(id, user_name)
+        #
+        # post_text = 'Welcome {}. You have 0 points.'
+        # self.post(post_text)
 
 
 # def set_up_db():
