@@ -4,6 +4,8 @@ from groupy import Bot, Group, config
 from flask import Flask, request
 import logging
 
+import urlparse
+import psycopg2
 import json
 import sys
 import os
@@ -58,6 +60,38 @@ class GroupMeBot(object):
         return 'OK'
 
 
+def set_up_db():
+    con = None
+
+    try:
+        urlparse.uses_netloc.append("postgres")
+        url = urlparse.urlparse(os.environ["DATABASE_URL"])
+
+        con = psycopg2.connect(database=url.path[1:],
+                               user=url.username,
+                               password=url.password,
+                               host=url.hostname,
+                               port=url.port
+                               )
+
+        cur = con.cursor()
+
+        sql = 'CREATE TABLE Ids(id INTEGER PRIMARY KEY, name TEXT, points ' \
+              'INTEGER)'
+        cur.execute(sql)
+
+        sql = 'INSERT INTO Ids VALUES({}, \'{}\', {})'
+        for key, value in member_dict.iteritems():
+            cur.execute(sql.format(value, key, 0))
+
+        con.commit()
+
+    except psycopg2.DatabaseError as e:
+        if con:
+            con.rollback()
+        print(e)
+
+
 if __name__ == '__main__':
     config.API_KEY = 'Obswbyyf83EViCprfCOJHER8XbhMCd0Up99c3FBj'
 
@@ -68,10 +102,13 @@ if __name__ == '__main__':
 
     which_group = 'bot_Test'
     group = Group.list().filter(name=which_group)[0]
+
     member_dict = {}
     for member in group.members():
         member_dict[member.nickname] = int(member.user_id)
 
-    app.route('/groupme', methods=['POST'])(ripbot.callback)
+    set_up_db()
+
     port = int(os.environ.get('PORT', 5000))
+    app.route('/groupme', methods=['POST'])(ripbot.callback)
     app.run('0.0.0.0', port=port)
