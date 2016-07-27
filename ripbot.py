@@ -136,7 +136,7 @@ class GroupMeBot(object):
 
         member = Group.list().filter(name=which_group)[0].members().filter(
             nickname=user_name)[0]
-        id = member.user_id
+        id = int(member.user_id)
 
         # check if user already in DB:
         if not rip_db.exists(id):
