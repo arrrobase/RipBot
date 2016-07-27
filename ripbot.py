@@ -138,7 +138,7 @@ class GroupMeBot(object):
             nickname=user_name)[0]
         id = int(member.user_id)
 
-        # check if user already in DB:
+        # check if user already in DB
         if not rip_db.exists(id):
             # TODO: PROBLEM could add new user with ID number of existing,
             # make a check etc.
@@ -357,6 +357,7 @@ class Rip_DB(object):
         try:
             self.cur.execute(sql.format(id))
             ret = self.cur.fetchone()
+            print(repr(ret))
 
             if ret is None:
                 return True
