@@ -82,7 +82,7 @@ class GroupMeBot(object):
         :param match: re match groups
         :param text: message text
         """
-        points_to = match.group(1)
+        points_to = match.group(1).rstrip()
         what_for = match.group(2).lstrip(' for ')
         if not what_for:
             what_for = 'nothing'
@@ -106,7 +106,7 @@ class GroupMeBot(object):
         :param match: re match groups
         :param text: message text
         """
-        points_to = match.group(1)
+        points_to = match.group(1).rstrip()
         what_for = match.group(2).lstrip(' for ')
         if not what_for:
             what_for = 'nothing'
