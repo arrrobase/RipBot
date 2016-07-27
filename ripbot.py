@@ -73,6 +73,7 @@ def set_up_db():
                                host=url.hostname,
                                port=url.port
                                )
+        log.info('Connected to DB')
 
         cur = con.cursor()
 
@@ -81,9 +82,10 @@ def set_up_db():
         cur.execute(sql)
 
         sql = 'INSERT INTO Ids VALUES({}, \'{}\', {})'
-        for key, value in member_dict.iteritems():
+        for key, value in member_dict.items():
             cur.execute(sql.format(value, key, 0))
 
+        log.info('Players added to DB')
         con.commit()
 
     except psycopg2.DatabaseError as e:
