@@ -4,6 +4,7 @@ from groupy import Bot, Group, config
 from flask import Flask, request
 import logging
 
+from random import randint
 import urllib.parse as urlparse
 import psycopg2
 import json
@@ -157,6 +158,9 @@ class Rip_DB(object):
         if self.con is not None:
             try:
                 self.cur.execute(sql.format(id, name, points))
+                self.con.commit()
+                log.info('Added {} to table with id# {} and {} point('
+                         's).'.format(name, id, points))
 
             except psycopg2.DatabaseError as e:
                 log.error(e)
@@ -179,14 +183,19 @@ class Rip_DB(object):
         if self.con is not None:
             try:
                 self.cur.execute(sql.format(id))
-                points = self.cur.fetchone()[0]
-                log.info('Fetched points of {} who has {} point(s).'.format(id,
+                points = self.cur.fetchone()
+                if points is not None:
+                    points = points[0]
+                    log.info('Fetched points of {} who has {} point(s).'.format(id,
                                                                           points))
+                else:
+                    points = 0
+                    id_num = self.new_id()
+                    self.add_player(id_num, str(id), points)
 
                 return points
 
             except psycopg2.DatabaseError as e:
-                self.con.rollback()
                 log.error(e)
 
         else:
@@ -206,10 +215,11 @@ class Rip_DB(object):
 
         if self.con is not None:
             try:
+                cur_points = self.get_player_points(id)
                 self.cur.execute(sql.format(id))
                 self.con.commit()
                 log.info('Added point to {}; now has {} point(s).'.format(id,
-                                                                         self.get_player_points(id)))
+                                                                          cur_points+1))
 
             except psycopg2.DatabaseError as e:
                 self.con.rollback()
@@ -232,10 +242,11 @@ class Rip_DB(object):
 
         if self.con is not None:
             try:
+                cur_points = self.get_player_points(id)
                 self.cur.execute(sql.format(id))
                 self.con.commit()
                 log.info('Added point to {}; now has {} point(s).'.format(id,
-                                                                         self.get_player_points(id)))
+                                                                          cur_points+1))
 
             except psycopg2.DatabaseError as e:
                 self.con.rollback()
@@ -243,6 +254,31 @@ class Rip_DB(object):
 
         else:
             log.error('Failed adding points: not connected to DB.')
+
+    def new_id(self):
+        """
+        Generates new IDs for non players that need points
+        :return: new random int
+        """
+        id = None
+        not_taken = False
+
+        sql = "UPDATE Ids SET points = points + 1 WHERE id={}"
+
+        while id is None or not_taken is False:
+            try:
+                id = randint(9999999, 100000000)
+                self.cur.execute(sql.format(id))
+                ret = self.cur.fetchone()
+                if ret is None:
+                    not_taken = True
+
+            except psycopg2.DatabaseError as e:
+                log.error(e)
+                break
+
+        return id
+
 
 
 if __name__ == '__main__':
