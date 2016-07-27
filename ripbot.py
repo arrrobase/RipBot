@@ -138,11 +138,14 @@ class GroupMeBot(object):
             nickname=user_name)[0]
         id = member.user_id
 
-        # TODO: PROBLEM could add new user with ID number of existing,
-        # make a check etc.
-        rip_db.add_player(id, user_name)
+        # check if user already in DB:
+        if not rip_db.exists(id):
+            # TODO: PROBLEM could add new user with ID number of existing,
+            # make a check etc.
+            rip_db.add_player(id, user_name)
 
-        post_text = 'Welcome {}. You have 0 points.'
+        points = rip_db.get_player_points(id)
+        post_text = 'Welcome {}. You have {} points.'.format(user_name, points)
         self.post(post_text)
 
 
@@ -342,6 +345,28 @@ class Rip_DB(object):
                 break
 
         return id
+
+    def exists(self, id):
+        """
+        Checks if user id already in table.
+        :param id: user id #
+        :return: boolean
+        """
+        sql = 'SELECT * FROM Ids WHERE id={}'
+
+        try:
+            self.cur.execute(sql.format(id))
+            ret = self.cur.fetchone()
+
+            if ret is None:
+                return True
+            else:
+                return False
+
+        except psycopg2.DatabaseError as e:
+            log.error(e)
+
+
 
 
 
