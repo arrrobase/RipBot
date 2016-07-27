@@ -55,43 +55,152 @@ class GroupMeBot(object):
                     if len(points_to) > 0:
                         log.info('MATCH: plusplus to {} in {}'.format(points_to,
                                                                       text))
-                        self.post(points_to + str(member_dict[points_to]))
+
+                        rip_db.add_point(points_to)
+                        points = rip_db.get_player_points(points_to)
+                        post_text = '{} now has {} points.'.format(points_to,
+                                                                   points)
+
+                        self.post(post_text)
 
         return 'OK'
 
 
-def set_up_db():
-    con = None
+# def set_up_db():
+#     con = None
+#
+#     try:
+#         urlparse.uses_netloc.append("postgres")
+#         url = urlparse.urlparse(os.environ["DATABASE_URL"])
+#
+#         con = psycopg2.connect(database=url.path[1:],
+#                                user=url.username,
+#                                password=url.password,
+#                                host=url.hostname,
+#                                port=url.port
+#                                )
+#         log.info('Connected to DB')
+#
+#         cur = con.cursor()
+#
+#         sql = 'CREATE TABLE Ids(id INTEGER PRIMARY KEY, name TEXT, points ' \
+#               'INTEGER)'
+#         cur.execute(sql)
+#
+#         sql = 'INSERT INTO Ids VALUES({}, \'{}\', {})'
+#         for key, value in member_dict.items():
+#             cur.execute(sql.format(value, key, 0))
+#
+#         log.info('Players added to DB')
+#         con.commit()
+#
+#     except psycopg2.DatabaseError as e:
+#         if con:
+#             con.rollback()
+#         print(e)
 
-    try:
-        urlparse.uses_netloc.append("postgres")
-        url = urlparse.urlparse(os.environ["DATABASE_URL"])
 
-        con = psycopg2.connect(database=url.path[1:],
-                               user=url.username,
-                               password=url.password,
-                               host=url.hostname,
-                               port=url.port
-                               )
-        log.info('Connected to DB')
+class Rip_DB(object):
+    """
+    Database holding player scores and ids
+    """
+    def __init__(self):
+        """
+        Connect to db and setup cursor.
+        """
+        self.con = None
+        self.cur = None
 
-        cur = con.cursor()
+        try:
+            urlparse.uses_netloc.append('postgres')
+            url = urlparse.urlparse(os.environ['DATABASE_URL'])
 
-        sql = 'CREATE TABLE Ids(id INTEGER PRIMARY KEY, name TEXT, points ' \
-              'INTEGER)'
-        cur.execute(sql)
+            self.con = psycopg2.connect(database=url.path[1:],
+                                        user=url.username,
+                                        password=url.password,
+                                        host=url.hostname,
+                                        port=url.port
+                                        )
+            log.info('Connect to database')
 
+            self.cur = self.con.cursor()
+
+        except psycopg2.DatabaseError as e:
+            if self.con:
+                self.con.rollback()
+            log.error(e)
+
+    def add_player(self, id, name, points=0):
+        """
+        Adds new player to table
+        :param id:
+        :param name:
+        :param points:
+        """
         sql = 'INSERT INTO Ids VALUES({}, \'{}\', {})'
-        for key, value in member_dict.items():
-            cur.execute(sql.format(value, key, 0))
 
-        log.info('Players added to DB')
-        con.commit()
+        if self.con is not None:
+            try:
+                self.cur.execute(sql.format(id, name, points))
 
-    except psycopg2.DatabaseError as e:
-        if con:
-            con.rollback()
-        print(e)
+            except psycopg2.DatabaseError as e:
+                log.error(e)
+
+        else:
+            log.error('Failed adding player: not connected to DB.')
+
+    def get_player_points(self, id):
+        """
+        Gets player points by name or id.
+        :param id: player name or id
+        :return: players points as int
+        """
+        if type(id) == int:
+            sql = "SELECT points FROM Ids WHERE id={}"
+
+        else:
+            sql = "SELECT points FROM Ids WHERE name='{}'"
+
+        if self.con is not None:
+            try:
+                self.cur.execute(sql.format(id))
+                points = self.cur.fetchone()[0]
+                log.info('Fetched points of {} who has {} points.'.format(id,
+                                                                          points))
+
+                return points
+
+            except psycopg2.DatabaseError as e:
+                self.con.rollback()
+                log.error(e)
+
+        else:
+            log.error('Failed retrieving player points: not connected to DB.')
+
+    def add_point(self, id):
+        """
+        Adds point to player by name or id.
+        :param id: player name or id
+        :return: players points as int
+        """
+        if type(id) == int:
+            sql = "UPDATE Ids SET points = points + 1 WHERE id={}"
+
+        else:
+            sql = "UPDATE Ids SET points = points + 1 WHERE name='{}'"
+
+        if self.con is not None:
+            try:
+                self.cur.execute(sql.format(id))
+                log.info('Added point to {}; now has {} point(s).'.format(id,
+                                                                         self.get_player_points(id)))
+
+            except psycopg2.DatabaseError as e:
+                self.con.rollback()
+                log.error(e)
+
+        else:
+            log.error('Failed adding points: not connected to DB.')
 
 
 if __name__ == '__main__':
@@ -109,7 +218,8 @@ if __name__ == '__main__':
     for member in group.members():
         member_dict[member.nickname] = int(member.user_id)
 
-    set_up_db()
+    # set_up_db()
+    rip_db = Rip_DB()
 
     port = int(os.environ.get('PORT', 5000))
     app.route('/groupme', methods=['POST'])(ripbot.callback)
