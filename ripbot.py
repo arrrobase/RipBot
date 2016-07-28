@@ -27,7 +27,13 @@ class GroupMeBot(object):
     """
     def __init__(self, post):
         self.post = post
-        self.post('RIPBOT IS BACK!!!')
+        log.info('Ripbot up and running.')
+
+        last_message = Group.list().filter(name=which_group)[0].messages().\
+            newest.text
+
+        if last_message != 'Idling... Goodbye.':
+            self.post('RIPBOT IS BACK!!!')
 
     def callback(self):
         """
@@ -161,7 +167,7 @@ class GroupMeBot(object):
         """
         Exit message.
         """
-        self.post('Goodbye.')
+        self.post('Idling... Goodbye.')
 
 
 # def set_up_db():
@@ -422,13 +428,8 @@ class RipbotServer(object):
         :param frame:
         """
         ripbot.goodbye()
-
-        # func = request.environ.get('werkzeug.server.shutdown')
-        # if func is None:
-        #     self.log.error('Not running with the Werkzeug Server')
         self.log.info('SIGTERM: shutting down')
-        sys.exit(0)
-        # func()
+        # sys.exit(0)
 
 if __name__ == '__main__':
     # get groupme API key
