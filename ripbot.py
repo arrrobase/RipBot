@@ -71,9 +71,13 @@ class GroupMeBot(object):
 
             if text is not None:
                 new_user = re.match('(.*?) added (.*?) to the group', text)
+                name_change = re.match('')
 
                 if new_user is not None:
                     self.is_new_user(new_user)
+
+                else:
+                    log.info('No matches; ignoring.')
 
         # non system messages not originating from ripbot
         elif name is not None and name != 'ripbot':
@@ -428,8 +432,8 @@ class RipbotServer(object):
         :param frame:
         """
         ripbot.goodbye()
-        self.log.info('SIGTERM: shutting down')
-        # sys.exit(0)
+        # self.log.info('SIGTERM: shutting down')
+        sys.exit(0)
 
 if __name__ == '__main__':
     # get groupme API key
