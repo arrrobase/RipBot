@@ -24,6 +24,7 @@ class GroupMeBot(object):
     """
     def __init__(self, post):
         self.post = post
+        self.post('RIPBOT IS BACK!!!')
 
     def callback(self):
         """
@@ -91,8 +92,7 @@ class GroupMeBot(object):
             log.info('MATCH: plusplus to {} in {}.'.format(points_to,
                                                           text))
 
-            rip_db.add_point(points_to)
-            points = rip_db.get_player_points(points_to)
+            points = rip_db.add_point(points_to)
             post_text = '{} now has {} point(s), ' \
                         'most recently for {}.'.format(points_to,
                                                        points,
@@ -115,8 +115,7 @@ class GroupMeBot(object):
             log.info('MATCH: minusminus to {} in {}.'.format(points_to,
                                                           text))
 
-            rip_db.sub_point(points_to)
-            points = rip_db.get_player_points(points_to)
+            points = rip_db.sub_point(points_to)
             post_text = '{} now has {} points, ' \
                         'most recently for {}.'.format(points_to,
                                                        points, what_for)
@@ -286,7 +285,8 @@ class Rip_DB(object):
                 self.cur.execute(sql.format(id))
                 self.con.commit()
                 log.info('ADD: point to {}; now has {} point(s).'.format(id,
-                                                                          cur_points+1))
+                                                                         cur_points+1))
+                return cur_points+1
 
             except psycopg2.DatabaseError as e:
                 self.con.rollback()
@@ -313,7 +313,8 @@ class Rip_DB(object):
                 self.cur.execute(sql.format(id))
                 self.con.commit()
                 log.info('SUB: point to {}; now has {} point(s).'.format(id,
-                                                                          cur_points+1))
+                                                                          cur_points-1))
+                return cur_points-1
 
             except psycopg2.DatabaseError as e:
                 self.con.rollback()
