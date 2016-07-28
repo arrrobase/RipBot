@@ -415,18 +415,20 @@ class RipbotServer(object):
         self.app.route('/groupme', methods=['POST'])(ripbot.callback)
         self.app.run('0.0.0.0', port=port)
 
-    def shutdown(self):
+    def shutdown(self, signun, frame):
         """
-        Gracefully shuts down flask server and ripbot
+        Gracefully shuts down flask server and ripbot.
+        :param signum:
+        :param frame:
         """
         ripbot.goodbye()
 
-        # func = request.environ.get('werkzeug.server.shutdown')
-        # if func is None:
-        #     self.log.error('Not running with the Werkzeug Server')
+        func = request.environ.get('werkzeug.server.shutdown')
+        if func is None:
+            self.log.error('Not running with the Werkzeug Server')
         self.log.info('SIGTERM: shutting down')
-        sys.exit(0)
-        # func()
+        # sys.exit(0)
+        func()
 
 if __name__ == '__main__':
     # get groupme API key
