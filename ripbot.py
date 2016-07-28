@@ -431,7 +431,7 @@ class RipbotServer(object):
         :param signum:
         :param frame:
         """
-        ripbot.goodbye()
+        # ripbot.goodbye()
         # self.log.info('SIGTERM: shutting down')
         sys.exit(0)
 
