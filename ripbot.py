@@ -423,12 +423,12 @@ class RipbotServer(object):
         """
         ripbot.goodbye()
 
-        func = request.environ.get('werkzeug.server.shutdown')
-        if func is None:
-            self.log.error('Not running with the Werkzeug Server')
-        self.log.info('SIGTERM: shutting down')
-        # sys.exit(0)
-        func()
+        # func = request.environ.get('werkzeug.server.shutdown')
+        # if func is None:
+        #     self.log.error('Not running with the Werkzeug Server')
+        # self.log.info('SIGTERM: shutting down')
+        sys.exit(0)
+        # func()
 
 if __name__ == '__main__':
     # get groupme API key
