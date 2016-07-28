@@ -406,6 +406,10 @@ class RipbotServer(object):
         # sigterm handler
         signal.signal(signal.SIGTERM, self.shutdown)
 
+    def setup(self):
+        """
+        Sets up callbacks.
+        """
         # send callbacks to ripbot
         port = int(os.environ.get('PORT', 5000))
         self.app.route('/groupme', methods=['POST'])(ripbot.callback)
@@ -451,6 +455,8 @@ if __name__ == '__main__':
 
     # initialize bot
     ripbot = GroupMeBot(bot.post)
+
+    server.setup()
 
     # initialize database class
     rip_db = RipDB()
