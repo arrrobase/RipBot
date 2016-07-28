@@ -434,13 +434,11 @@ if __name__ == '__main__':
     which_bot = 'ripbot'
     bot = Bot.list().filter(name=which_bot)[0]
 
-    ripbot = GroupMeBot(bot.post)
-
+    # to set up initial postgres member database
     # bot's groupme
     which_group = 'bot_Test'
-    group = Group.list().filter(name=which_group)[0]
-
-    # to set up initial postgres member database
+    # group = Group.list().filter(name=which_group)[0]
+    #
     # member_dict = {}
     # for member in group.members():
     #     member_dict[member.nickname] = int(member.user_id)
@@ -449,6 +447,9 @@ if __name__ == '__main__':
     # start server
     server = RipbotServer()
     log = server.log
+
+    # initialize bot
+    ripbot = GroupMeBot(bot.post)
 
     # initialize database class
     rip_db = RipDB()
