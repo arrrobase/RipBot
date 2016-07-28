@@ -426,7 +426,7 @@ class RipbotServer(object):
         # func = request.environ.get('werkzeug.server.shutdown')
         # if func is None:
         #     self.log.error('Not running with the Werkzeug Server')
-        # self.log.info('SIGTERM: shutting down')
+        self.log.info('SIGTERM: shutting down')
         sys.exit(0)
         # func()
 
