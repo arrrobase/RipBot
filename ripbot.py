@@ -456,7 +456,8 @@ if __name__ == '__main__':
     # initialize bot
     ripbot = GroupMeBot(bot.post)
 
-    server.setup()
-
     # initialize database class
     rip_db = RipDB()
+
+    # init callbacks
+    server.setup()
