@@ -10,6 +10,7 @@ from __future__ import print_function
 from groupy import Bot, Group, config
 from flask import Flask, request
 import logging
+import signal
 
 from random import randint
 import urllib.parse as urlparse
@@ -18,12 +19,6 @@ import json
 import sys
 import os
 import re
-
-# start flask and set up logging
-app = Flask(__name__)
-log = app.logger
-log.addHandler(logging.StreamHandler(sys.stdout))
-log.setLevel(logging.INFO)
 
 
 class GroupMeBot(object):
@@ -86,8 +81,11 @@ class GroupMeBot(object):
                 if plusplus is not None:
                     self.is_plusplus(plusplus, text)
 
-                if minusminus is not None:
+                elif minusminus is not None:
                     self.is_minusminus(minusminus, text)
+
+                else:
+                    log.info('No matches; ignoring.')
 
     def is_plusplus(self, match, text):
         """
@@ -159,6 +157,12 @@ class GroupMeBot(object):
         post_text = 'Welcome {}. You have {} points.'.format(user_name, points)
         self.post(post_text)
 
+    def goodbye(self):
+        """
+        Exit message.
+        """
+        self.post('Goodbye.')
+
 
 # def set_up_db():
 #     con = None
@@ -194,7 +198,7 @@ class GroupMeBot(object):
 #         print(e)
 
 
-class Rip_DB(object):
+class RipDB(object):
     """
     Database holding player scores and ids
     """
@@ -385,6 +389,40 @@ class Rip_DB(object):
             log.error(e)
 
 
+class RipbotServer(object):
+    """
+    Simple server for the ripbot.
+    """
+    def __init__(self):
+        """
+        Set server up.
+        """
+        # start flask and set up logging
+        self.app = Flask(__name__)
+        self.log = self.app.logger
+        self.log.addHandler(logging.StreamHandler(sys.stdout))
+        self.log.setLevel(logging.INFO)
+
+        # sigterm handler
+        signal.signal(signal.SIGTERM, self.shutdown)
+
+        # send callbacks to ripbot
+        port = int(os.environ.get('PORT', 5000))
+        self.app.route('/groupme', methods=['POST'])(ripbot.callback)
+        self.app.run('0.0.0.0', port=port)
+
+    def shutdown(self):
+        """
+        Gracefully shuts down flask server and ripbot
+        """
+        ripbot.goodbye()
+
+        func = request.environ.get('werkzeug.server.shutdown')
+        if func is None:
+            self.log.error('Not running with the Werkzeug Server')
+        self.log.info('SIGTERM: shutting down')
+        func()
+
 if __name__ == '__main__':
     # get groupme API key
     with open('.groupy.key', 'r') as f:
@@ -408,10 +446,9 @@ if __name__ == '__main__':
     #     member_dict[member.nickname] = int(member.user_id)
     # set_up_db()
 
-    # initialize database class
-    rip_db = Rip_DB()
+    # start server
+    server = RipbotServer()
+    log = server.log
 
-    # send callbacks to ripbot
-    port = int(os.environ.get('PORT', 5000))
-    app.route('/groupme', methods=['POST'])(ripbot.callback)
-    app.run('0.0.0.0', port=port)
+    # initialize database class
+    rip_db = RipDB()
