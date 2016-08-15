@@ -29,12 +29,6 @@ class GroupMeBot(object):
         self.post = post
         log.info('Ripbot up and running.')
 
-        last_message = Group.list().filter(name=which_group)[0].messages().\
-            newest.text
-
-        if last_message != 'Idling... Goodbye.':
-            self.post('RIPBOT IS BACK!!!')
-
     def callback(self):
         """
         Method to send responses on callbacks.
@@ -166,12 +160,6 @@ class GroupMeBot(object):
         points = rip_db.get_player_points(user_id)
         post_text = 'Welcome {}. You have {} points.'.format(user_name, points)
         self.post(post_text)
-
-    def goodbye(self):
-        """
-        Exit message.
-        """
-        self.post('Idling... Goodbye.')
 
 
 # def set_up_db():
