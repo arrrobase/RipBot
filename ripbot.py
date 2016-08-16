@@ -103,19 +103,20 @@ class GroupMeBot(object):
         what_for = match.group(2).lstrip(' for ')
         what_for = match.group(2).lstrip(' because ')
 
-        # if no reason given
-        if not what_for:
-            what_for = 'nothing'
-
         if len(points_to) > 0:
             log.info('MATCH: plusplus to {} in {}.'.format(points_to,
                                                            text))
 
             points = rip_db.add_point(points_to)
-            post_text = '{} now has {} point(s), ' \
-                        'most recently for {}.'.format(points_to,
-                                                       points,
-                                                       what_for)
+
+            if what_for:
+                post_text = '{} now has {} point(s), ' \
+                            'most recently for {}.'.format(points_to,
+                                                           points,
+                                                           what_for)
+            else what_for:
+                post_text = '{} now has {} point(s).'.format(points_to,
+                                                           points)
 
             self.post(post_text)
 
@@ -127,19 +128,22 @@ class GroupMeBot(object):
         """
         points_to = match.group(1).rstrip()
         what_for = match.group(2).lstrip(' for ')
-        # if no reason given
-        if not what_for:
-            what_for = 'nothing'
 
         if len(points_to) > 0:
             log.info('MATCH: minusminus to {} in {}.'.format(points_to,
                                                              text))
 
             points = rip_db.sub_point(points_to)
-            post_text = '{} now has {} points, ' \
-                        'most recently for {}.'.format(points_to,
-                                                       points,
-                                                       what_for)
+
+            if what_for:
+                post_text = '{} now has {} points, ' \
+                            'most recently for {}.'.format(points_to,
+                                                           points,
+                                                           what_for)
+
+            else:
+                post_text = '{} now has {} points.'.format(points_to,
+                                                           points)
 
             self.post(post_text)
 
