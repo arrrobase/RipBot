@@ -79,8 +79,8 @@ class GroupMeBot(object):
 
             if text is not None:
                 # matches string in format: '@First Last ++ more text'
-                plusplus =   re.match('^@(.*?) \+\+(.*)', text)
-                minusminus = re.match('^@(.*?) \-\-(.*)', text)
+                plusplus =   re.match('^(.*?) \+\+(.*)', text)
+                minusminus = re.match('^(.*?) \-\-(.*)', text)
 
                 if plusplus is not None:
                     self.is_plusplus(plusplus, text)
