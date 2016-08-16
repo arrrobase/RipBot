@@ -202,6 +202,7 @@ class RipDB(object):
             table_exists = self.cur.fetchone()[0]
 
             if not table_exists:
+                log.warning('DB: table not found, creating...')
                 self.set_up_table()
 
         except psycopg2.DatabaseError as e:
@@ -224,7 +225,7 @@ class RipDB(object):
         try:
             if self.con is not None:
                 self.cur.execute(sql)
-
+                log.info('DB: rip_users table created')
 
         except psycopg2.DatabaseError as e:
             if self.con:
