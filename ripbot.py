@@ -98,7 +98,11 @@ class GroupMeBot(object):
         :param text: message text
         """
         points_to = match.group(1).rstrip()
+        points_to = match.group(1).lstrip('@')
+
         what_for = match.group(2).lstrip(' for ')
+        what_for = match.group(2).lstrip(' because ')
+
         # if no reason given
         if not what_for:
             what_for = 'nothing'
@@ -234,7 +238,7 @@ class RipDB(object):
         :param name: groupme nickname
         :param points: points to start with
         """
-        sql = 'INSERT INTO Ids VALUES({}, \'{}\', {})'
+        sql = 'INSERT INTO rip_users VALUES({}, \'{}\', {})'
 
         if self.con is not None:
             try:
@@ -256,10 +260,10 @@ class RipDB(object):
         :return: players points as int
         """
         if type(id) == int:
-            sql = "SELECT points FROM Ids WHERE id={}"
+            sql = "SELECT points FROM rip_users WHERE id={}"
 
         else:
-            sql = "SELECT points FROM Ids WHERE name='{}'"
+            sql = "SELECT points FROM rip_users WHERE name='{}'"
 
         if self.con is not None:
             try:
@@ -289,10 +293,10 @@ class RipDB(object):
         :return: players points as int
         """
         if type(id) == int:
-            sql = "UPDATE Ids SET points = points + 1 WHERE id={}"
+            sql = "UPDATE rip_users SET points = points + 1 WHERE id={}"
 
         else:
-            sql = "UPDATE Ids SET points = points + 1 WHERE name='{}'"
+            sql = "UPDATE rip_users SET points = points + 1 WHERE name='{}'"
 
         if self.con is not None:
             try:
@@ -318,10 +322,10 @@ class RipDB(object):
         :return: players points as int
         """
         if type(id) == int:
-            sql = "UPDATE Ids SET points = points - 1 WHERE id={}"
+            sql = "UPDATE rip_users SET points = points - 1 WHERE id={}"
 
         else:
-            sql = "UPDATE Ids SET points = points - 1 WHERE name='{}'"
+            sql = "UPDATE rip_users SET points = points - 1 WHERE name='{}'"
 
         if self.con is not None:
             try:
@@ -348,7 +352,7 @@ class RipDB(object):
         id = None
         not_taken = False
 
-        sql = "SELECT * FROM Ids WHERE id={}"
+        sql = "SELECT * FROM rip_users WHERE id={}"
 
         while id is None or not_taken is False:
             try:
@@ -370,7 +374,7 @@ class RipDB(object):
         :param id: user id #
         :return: boolean
         """
-        sql = 'SELECT * FROM Ids WHERE id={}'
+        sql = 'SELECT * FROM rip_users WHERE id={}'
 
         try:
             self.cur.execute(sql.format(id))
@@ -417,8 +421,7 @@ class RipbotServer(object):
         :param signum:
         :param frame:
         """
-        # ripbot.goodbye()
-        # self.log.info('SIGTERM: shutting down')
+        self.log.info('SIGTERM: shutting down')
         sys.exit(0)
 
 if __name__ == '__main__':
