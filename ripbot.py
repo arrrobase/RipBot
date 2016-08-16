@@ -65,10 +65,13 @@ class GroupMeBot(object):
 
             if text is not None:
                 new_user = re.match('(.*?) added (.*?) to the group', text)
-                # name_change = re.match('')
+                name_change = re.match('(.*?) changed name to (.*)', text)
 
                 if new_user is not None:
                     self.is_new_user(new_user)
+
+                elif name_change is not None:
+                    self.is_name_change(name_change)
 
                 else:
                     log.info('No matches; ignoring.')
@@ -116,7 +119,7 @@ class GroupMeBot(object):
                                                            what_for)
             else:
                 post_text = '{} now has {} point(s).'.format(points_to,
-                                                           points)
+                                                             points)
 
             self.post(post_text)
 
@@ -142,8 +145,8 @@ class GroupMeBot(object):
                                                            what_for)
 
             else:
-                post_text = '{} now has {} points.'.format(points_to,
-                                                           points)
+                post_text = '{} now has {} point(s).'.format(points_to,
+                                                             points)
 
             self.post(post_text)
 
@@ -167,6 +170,32 @@ class GroupMeBot(object):
 
         points = rip_db.get_player_points(user_id)
         post_text = 'Welcome {}. You have {} points.'.format(user_name, points)
+        self.post(post_text)
+
+    def is_name_change(self, match):
+        """
+        Changed name in DB on nickname change.
+        :param match: re match groups
+        """
+        user_name = match.group(1)
+        new_name = match.group(2)
+        log.info('SYSTEM MATCH: nickname change detected.')
+
+        member = Group.list().filter(name=which_group)[0].members().filter(
+            nickname=user_name)[0]
+        user_id = int(member.user_id)
+
+        # check if user already in DB
+        if not rip_db.exists(user_id):
+            log.error('DB: user not found in DB but should have been.')
+            return
+
+        rip_db.change_player_name(new_name, user_id)
+
+        points = rip_db.get_player_points(user_id)
+        post_text = 'Don\'t worry {}, you still have your {} point(s).'.format(
+            user_name, points)
+
         self.post(post_text)
 
 
@@ -349,6 +378,33 @@ class RipDB(object):
 
         else:
             log.error('Failed adding points: not connected to DB.')
+
+    def change_player_name(self, new_name, id):
+        """
+        Changes the players name in the db
+        :param new_name:
+        :param id:
+        :return:
+        """
+        if type(id) == int:
+            sql = 'UPDATE rip_users SET name=\'{}\' where id={}'
+
+        else:
+            sql = 'UPDATE rip_users SET name=\'{}\' where name={}'
+
+        if self.con is not None:
+            try:
+                self.cur.execute(sql.format(new_name, id))
+                self.con.commit()
+
+                log.info('DB: {} name changed to {}'.format(id, new_name))
+
+            except psycopg2.DatabaseError as e:
+                self.con.rollback()
+                log.error(e)
+
+        else:
+            log.error('Failed changing name: not connected to DB.')
 
     def new_id(self):
         """
