@@ -114,7 +114,7 @@ class GroupMeBot(object):
                             'most recently for {}.'.format(points_to,
                                                            points,
                                                            what_for)
-            else what_for:
+            else:
                 post_text = '{} now has {} point(s).'.format(points_to,
                                                            points)
 
