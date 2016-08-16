@@ -474,7 +474,7 @@ class RipDB(object):
         sql = 'SELECT * FROM rip_users WHERE id={}'
 
         try:
-            log.info('MESSAGE: ' + repr(id))
+            # log.info('MESSAGE: ' + repr(id))
             self.cur.execute(sql.format(id))
             ret = self.cur.fetchone()
 
