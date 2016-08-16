@@ -308,13 +308,14 @@ class RipDB(object):
             try:
                 self.cur.execute(sql.format(id))
                 points = self.cur.fetchone()
+
                 if points is not None:
                     points = points[0]
                     log.info('DB: Fetched points of {} who has {} point(s).'.
                              format(id, points))
                 else:
                     points = 0
-                    id_num = self.new_id()
+                    id_num = self.new_id(id)
                     self.add_player(id_num, str(id), points)
 
                 return points
@@ -410,12 +411,20 @@ class RipDB(object):
         else:
             log.error('Failed changing name: not connected to DB.')
 
-    def new_id(self):
+    def new_id(self, id=None):
         """
         Generates new IDs for non players that need points
         :return: new random int
         """
-        id = None
+        if id is not None:
+            try:
+                member = Group.list().filter(name=which_group)[0].members().filter(
+                    nickname=id)[0]
+                id = int(member.user_id)
+
+            except IndexError:
+                id = None
+
         not_taken = False
 
         sql = "SELECT * FROM rip_users WHERE id={}"
