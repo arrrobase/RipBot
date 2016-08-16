@@ -189,7 +189,7 @@ class GroupMeBot(object):
         :param match: re match groups
         """
         user_name = match.group(1).rstrip()
-        new_name = match.group(2).rstip()
+        new_name = match.group(2).rstrip()
         log.info('SYSTEM MATCH: nickname change detected.')
 
         try:
