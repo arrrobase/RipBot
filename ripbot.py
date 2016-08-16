@@ -421,6 +421,7 @@ class RipDB(object):
                 member = Group.list().filter(name=which_group)[0].members().filter(
                     nickname=id)[0]
                 id = int(member.user_id)
+                log.info('ID: Got ID from Groupme. #{}'.format(id))
 
             except IndexError:
                 id = None
@@ -429,17 +430,21 @@ class RipDB(object):
 
         sql = "SELECT * FROM rip_users WHERE id={}"
 
-        while id is None or not_taken is False:
-            try:
-                id = randint(9999999, 100000000)
-                self.cur.execute(sql.format(id))
-                ret = self.cur.fetchone()
-                if ret is None:
-                    not_taken = True
+        if id is None:
+            while not not_taken:
+                try:
+                    id = randint(9999999, 100000000)
+                    self.cur.execute(sql.format(id))
+                    ret = self.cur.fetchone()
+                    if ret is None:
+                        not_taken = True
 
-            except psycopg2.DatabaseError as e:
-                log.error(e)
-                break
+                except psycopg2.DatabaseError as e:
+                    log.error(e)
+                    break
+
+        if not_taken:
+            log.info('ID: Got ID from random. #{}'.format(id))
 
         return id
 
