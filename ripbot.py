@@ -168,7 +168,9 @@ class GroupMeBot(object):
         user_name = match.group(2)
         log.info('SYSTEM MATCH: new user detected.')
 
-        member = Group.list().filter(name=which_group)[0].members().filter(
+        # member = Group.list().filter(name=which_group)[0].members().filter(
+        #     nickname=user_name)[0]
+        member = Group.list().filter(group_id=group_id)[0].members().filter(
             nickname=user_name)[0]
         user_id = int(member.user_id)
 
@@ -191,7 +193,9 @@ class GroupMeBot(object):
         log.info('SYSTEM MATCH: nickname change detected.')
 
         try:
-            member = Group.list().filter(name=which_group)[0].members().filter(
+            # member = Group.list().filter(name=which_group)[0].members().filter(
+            #     nickname=new_name)[0]
+            member = Group.list().filter(group_id=group_id)[0].members().filter(
                 nickname=new_name)[0]
             user_id = int(member.user_id)
 
@@ -427,7 +431,9 @@ class RipDB(object):
         """
         if id is not None:
             try:
-                member = Group.list().filter(name=which_group)[0].members().filter(
+                # member = Group.list().filter(name=which_group)[0].members().filter(
+                #     nickname=id)[0]
+                member = Group.list().filter(group_id=group_id)[0].members().filter(
                     nickname=id)[0]
                 id = int(member.user_id)
                 log.info('ID: Got ID from Groupme. #{}'.format(id))
@@ -525,7 +531,8 @@ if __name__ == '__main__':
     bot = Bot.list().filter(name=which_bot)[0]
 
     # bot's groupme
-    which_group = 'bot_Test'
+    which_group = 'Bow City'
+    group_id = 23373961
 
     # start server
     server = RipbotServer()
