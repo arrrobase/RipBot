@@ -181,20 +181,24 @@ class GroupMeBot(object):
         new_name = match.group(2)
         log.info('SYSTEM MATCH: nickname change detected.')
 
-        member = Group.list().filter(name=which_group)[0].members().filter(
-            nickname=user_name)[0]
-        user_id = int(member.user_id)
+        try:
+            member = Group.list().filter(name=which_group)[0].members().filter(
+                nickname=new_name)[0]
+            user_id = int(member.user_id)
 
-        # check if user already in DB
-        if not rip_db.exists(user_id):
-            log.error('DB: user not found in DB but should have been.')
-            return
+            # check if user already in DB
+            if not rip_db.exists(user_id):
+                log.error('DB: user not found in DB but should have been.')
+                return
+
+        except IndexError:  # fallback to switching by name rather than user_id
+            user_id = user_name
 
         rip_db.change_player_name(new_name, user_id)
 
         points = rip_db.get_player_points(user_id)
         post_text = 'Don\'t worry {}, you still have your {} point(s).'.format(
-            user_name, points)
+            new_name, points)
 
         self.post(post_text)
 
