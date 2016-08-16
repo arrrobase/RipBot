@@ -112,14 +112,17 @@ class GroupMeBot(object):
 
             points = rip_db.add_point(points_to)
 
+            post_text = '{} now has {} point'
+
+            if points != 1:
+                post_text += 's'
+
             if what_for:
-                post_text = '{} now has {} point(s), ' \
-                            'most recently for {}.'.format(points_to,
-                                                           points,
-                                                           what_for)
+                post_text += ', most recently for {}.'
+                post_text = post_text.format(points_to, points, what_for)
             else:
-                post_text = '{} now has {} point(s).'.format(points_to,
-                                                             points)
+                post_text += '.'
+                post_text = post_text.format(points_to, points)
 
             self.post(post_text)
 
@@ -138,15 +141,17 @@ class GroupMeBot(object):
 
             points = rip_db.sub_point(points_to)
 
-            if what_for:
-                post_text = '{} now has {} points, ' \
-                            'most recently for {}.'.format(points_to,
-                                                           points,
-                                                           what_for)
+            post_text = '{} now has {} point'
 
+            if points != 1:
+                post_text += 's'
+
+            if what_for:
+                post_text += ', most recently for {}.'
+                post_text = post_text.format(points_to, points, what_for)
             else:
-                post_text = '{} now has {} point(s).'.format(points_to,
-                                                             points)
+                post_text += '.'
+                post_text = post_text.format(points_to, points)
 
             self.post(post_text)
 
