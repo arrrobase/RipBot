@@ -195,7 +195,7 @@ class RipDB(object):
             self.cur = self.con.cursor()
 
             # check if rip_users table exists, if not create
-            sql = 'SELECT EXISTS(SELECT * FROM information_schema_tables ' \
+            sql = 'SELECT EXISTS(SELECT 1 FROM information_schema.tables ' \
                   'WHERE table_name=\'{}\')'.format('rip_users')
 
             self.cur.execute(sql)
@@ -226,6 +226,7 @@ class RipDB(object):
             if self.con is not None:
                 self.cur.execute(sql)
                 log.info('DB: rip_users table created')
+                self.con.commit()
 
         except psycopg2.DatabaseError as e:
             if self.con:
