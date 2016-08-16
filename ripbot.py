@@ -106,7 +106,7 @@ class GroupMeBot(object):
 
         what_for = match.group(3).lstrip().rstrip()
         what_for = what_for.lstrip('for').lstrip()
-        what_for = what_for.lstrip('because ').lstrip()
+        what_for = what_for.lstrip('because').lstrip()
 
         if len(points_to) > 0:
             log.info('MATCH: plusplus to {} in {}.'.format(points_to,
