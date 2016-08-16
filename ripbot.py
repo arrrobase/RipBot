@@ -77,7 +77,7 @@ class GroupMeBot(object):
                     log.info('No matches; ignoring.')
 
         # non system messages not originating from ripbot
-        elif name is not None and name != 'ripbot':
+        elif name is not None and name != 'temp-ripbot':
             log.info('BOT: Got user message, parsing...')
 
             if text is not None:
