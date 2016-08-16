@@ -282,7 +282,7 @@ class RipDB(object):
         except psycopg2.DatabaseError as e:
             if self.con:
                 self.con.rollback()
-            print(e)
+            log.error(e)
 
     def add_player(self, id, name, points=0):
         """
@@ -473,7 +473,7 @@ class RipDB(object):
         sql = 'SELECT * FROM rip_users WHERE id={}'
 
         try:
-            print(repr(id))
+            log.info(repr(id))
             self.cur.execute(sql.format(id))
             ret = self.cur.fetchone()
 
