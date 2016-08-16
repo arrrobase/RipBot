@@ -65,7 +65,7 @@ class GroupMeBot(object):
 
             if text is not None:
                 new_user = re.match('(.*?) added (.*?) to the group', text)
-                name_change = re.match('')
+                # name_change = re.match('')
 
                 if new_user is not None:
                     self.is_new_user(new_user)
@@ -162,40 +162,6 @@ class GroupMeBot(object):
         self.post(post_text)
 
 
-# def set_up_db():
-#     con = None
-#
-#     try:
-#         urlparse.uses_netloc.append("postgres")
-#         url = urlparse.urlparse(os.environ["DATABASE_URL"])
-#
-#         con = psycopg2.connect(database=url.path[1:],
-#                                user=url.username,
-#                                password=url.password,
-#                                host=url.hostname,
-#                                port=url.port
-#                                )
-#         log.info('DB: Connected to DB')
-#
-#         cur = con.cursor()
-#
-#         sql = 'CREATE TABLE Ids(id INTEGER PRIMARY KEY, name TEXT, points ' \
-#               'INTEGER)'
-#         cur.execute(sql)
-#
-#         sql = 'INSERT INTO Ids VALUES({}, \'{}\', {})'
-#         for key, value in member_dict.items():
-#             cur.execute(sql.format(value, key, 0))
-#
-#         log.info('DB: Players added to DB')
-#         con.commit()
-#
-#     except psycopg2.DatabaseError as e:
-#         if con:
-#             con.rollback()
-#         print(e)
-
-
 class RipDB(object):
     """
     Database holding player scores and ids
@@ -224,10 +190,42 @@ class RipDB(object):
             # set up cursor for actions
             self.cur = self.con.cursor()
 
+            # check if rip_users table exists, if not create
+            sql = 'SELECT EXISTS(SELECT * FROM information_schema_tables ' \
+                  'WHERE table_name=\'{}\')'.format('rip_users')
+
+            self.cur.execute(sql)
+            table_exists = self.cur.fetchone()[0]
+
+            if not table_exists:
+                self.set_up_table()
+
         except psycopg2.DatabaseError as e:
             if self.con:
                 self.con.rollback()
             log.error(e)
+
+    def set_up_table(self):
+        """
+        Sets up postgres table if none found.
+
+        :return:
+        """
+        sql = 'CREATE TABLE rip_users (' \
+              'id INT PRIMARY KEY,' \
+              'name TEXT,'\
+              'points INT'\
+              ')'
+
+        try:
+            if self.con is not None:
+                self.cur.execute(sql)
+
+
+        except psycopg2.DatabaseError as e:
+            if self.con:
+                self.con.rollback()
+            print(e)
 
     def add_player(self, id, name, points=0):
         """
@@ -434,15 +432,8 @@ if __name__ == '__main__':
     which_bot = 'ripbot'
     bot = Bot.list().filter(name=which_bot)[0]
 
-    # to set up initial postgres member database
     # bot's groupme
     which_group = 'bot_Test'
-    # group = Group.list().filter(name=which_group)[0]
-    #
-    # member_dict = {}
-    # for member in group.members():
-    #     member_dict[member.nickname] = int(member.user_id)
-    # set_up_db()
 
     # start server
     server = RipbotServer()
