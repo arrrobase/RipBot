@@ -534,8 +534,8 @@ if __name__ == '__main__':
     bot = Bot.list().filter(name=which_bot)[0]
 
     # bot's groupme
-    which_group = 'Bow City'
-    group_id = 23373961
+    # which_group = 'bot_Test'
+    group_id = '23373961'
 
     # start server
     server = RipbotServer()
