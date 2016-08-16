@@ -511,7 +511,7 @@ if __name__ == '__main__':
     config.API_KEY = key
 
     # which bot to use
-    which_bot = 'ripbot'
+    which_bot = 'temp-ripbot'
     bot = Bot.list().filter(name=which_bot)[0]
 
     # bot's groupme
