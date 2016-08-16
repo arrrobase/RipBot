@@ -105,8 +105,8 @@ class GroupMeBot(object):
         points_to = points_to.lstrip('@')
 
         what_for = match.group(3).lstrip()
-        what_for = what_for.lstrip('for ')
-        what_for = what_for.lstrip('because ')
+        what_for = what_for.lstrip('for').lstrip()
+        what_for = what_for.lstrip('because ').lstrip()
 
         if len(points_to) > 0:
             log.info('MATCH: plusplus to {} in {}.'.format(points_to,
@@ -139,8 +139,8 @@ class GroupMeBot(object):
         points_to = points_to.lstrip('@')
 
         what_for = match.group(3).lstrip()
-        what_for = what_for.lstrip('for ')
-        what_for = what_for.lstrip('because ')
+        what_for = what_for.lstrip('for ').lstrip()
+        what_for = what_for.lstrip('because ').lstrip()
 
         if len(points_to) > 0:
             log.info('MATCH: minusminus to {} in {}.'.format(points_to,
