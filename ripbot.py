@@ -407,10 +407,10 @@ class RipDB(object):
         :return:
         """
         if type(id) == int:
-            sql = 'UPDATE rip_users SET name=\'{}\' where id={}'
+            sql = "UPDATE rip_users SET name='{}' where id={}"
 
         else:
-            sql = 'UPDATE rip_users SET name=\'{}\' where name={}'
+            sql = "UPDATE rip_users SET name='{}' where name='{}'"
 
         if self.con is not None:
             try:
