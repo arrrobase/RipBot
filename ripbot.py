@@ -164,12 +164,11 @@ class GroupMeBot(object):
 
         # check if user already in DB
         if not rip_db.exists(user_id):
-            # TODO: PROBLEM could add new user with ID number of existing,
-            # very unlikely given 8 digit int, but make a check anyway
             rip_db.add_player(user_id, user_name)
 
         points = rip_db.get_player_points(user_id)
         post_text = 'Welcome {}. You have {} points.'.format(user_name, points)
+
         self.post(post_text)
 
     def is_name_change(self, match):
@@ -188,7 +187,7 @@ class GroupMeBot(object):
 
             # check if user already in DB
             if not rip_db.exists(user_id):
-                log.error('DB: user not found in DB but should have been.')
+                log.warning('DB: user not found in DB but should have been.')
                 return
 
         except IndexError:  # fallback to switching by name rather than user_id
@@ -232,8 +231,8 @@ class RipDB(object):
             self.cur = self.con.cursor()
 
             # check if rip_users table exists, if not create
-            sql = 'SELECT EXISTS(SELECT 1 FROM information_schema.tables ' \
-                  'WHERE table_name=\'{}\')'.format('rip_users')
+            sql = "SELECT EXISTS(SELECT 1 FROM information_schema.tables " \
+                  "WHERE table_name='{}')".format('rip_users')
 
             self.cur.execute(sql)
             table_exists = self.cur.fetchone()[0]
@@ -253,11 +252,11 @@ class RipDB(object):
 
         :return:
         """
-        sql = 'CREATE TABLE rip_users (' \
-              'id INT PRIMARY KEY,' \
-              'name TEXT,'\
-              'points INT'\
-              ')'
+        sql = "CREATE TABLE rip_users (" \
+              "id INT PRIMARY KEY," \
+              "name TEXT,"\
+              "points INT"\
+              ")"
 
         try:
             if self.con is not None:
@@ -277,7 +276,7 @@ class RipDB(object):
         :param name: groupme nickname
         :param points: points to start with
         """
-        sql = 'INSERT INTO rip_users VALUES({}, \'{}\', {})'
+        sql = "INSERT INTO rip_users VALUES({}, '{}', {})"
 
         if self.con is not None:
             try:
