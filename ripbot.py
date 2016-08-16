@@ -473,6 +473,7 @@ class RipDB(object):
         sql = 'SELECT * FROM rip_users WHERE id={}'
 
         try:
+            print(repr(id))
             self.cur.execute(sql.format(id))
             ret = self.cur.fetchone()
 
