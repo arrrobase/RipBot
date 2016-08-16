@@ -82,7 +82,7 @@ class GroupMeBot(object):
 
             if text is not None:
                 # matches string in format: '@First Last ++ more text'
-                plus_minus = re.match('^(.*?) (\+\+|\-\-)(.*)', text)
+                plus_minus = re.match('^(.*?)(\+\+|\-\-)(.*)', text)
 
                 if plus_minus is not None:
                     if plus_minus.group(2) == '++':
