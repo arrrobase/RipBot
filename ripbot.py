@@ -82,14 +82,14 @@ class GroupMeBot(object):
 
             if text is not None:
                 # matches string in format: '@First Last ++ more text'
-                plusplus =   re.match('^(.*?) \+\+(.*)', text)
-                minusminus = re.match('^(.*?) \-\-(.*)', text)
+                plus_minus = re.match('^(.*?) (\+\+|\-\-)(.*)', text)
 
-                if plusplus is not None:
-                    self.is_plusplus(plusplus, text)
+                if plus_minus is not None:
+                    if plus_minus.group(2) == '++':
+                        self.is_plusplus(plus_minus, text)
 
-                elif minusminus is not None:
-                    self.is_minusminus(minusminus, text)
+                    elif plus_minus.group(2) == '--':
+                        self.is_minusminus(plus_minus, text)
 
                 else:
                     log.info('No matches; ignoring.')
@@ -103,8 +103,8 @@ class GroupMeBot(object):
         points_to = match.group(1).rstrip()
         points_to = match.group(1).lstrip('@')
 
-        what_for = match.group(2).lstrip(' for ')
-        what_for = match.group(2).lstrip(' because ')
+        what_for = match.group(3).lstrip(' for ')
+        what_for = match.group(3).lstrip(' because ')
 
         if len(points_to) > 0:
             log.info('MATCH: plusplus to {} in {}.'.format(points_to,
@@ -135,8 +135,8 @@ class GroupMeBot(object):
         points_to = match.group(1).rstrip()
         points_to = match.group(1).lstrip('@')
 
-        what_for = match.group(2).lstrip(' for ')
-        what_for = match.group(2).lstrip(' because ')
+        what_for = match.group(3).lstrip(' for ')
+        what_for = match.group(3).lstrip(' because ')
 
         if len(points_to) > 0:
             log.info('MATCH: minusminus to {} in {}.'.format(points_to,
