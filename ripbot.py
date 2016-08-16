@@ -101,11 +101,12 @@ class GroupMeBot(object):
         :param text: message text
         """
         points_to = match.group(1).rstrip()
-        points_to = match.group(1).lstrip()
-        points_to = match.group(1).lstrip('@')
+        points_to = points_to.lstrip()
+        points_to = points_to.lstrip('@')
 
-        what_for = match.group(3).lstrip(' for ')
-        what_for = match.group(3).lstrip(' because ')
+        what_for = match.group(3).lstrip()
+        what_for = what_for.lstrip('for ')
+        what_for = what_for.lstrip('because ')
 
         if len(points_to) > 0:
             log.info('MATCH: plusplus to {} in {}.'.format(points_to,
@@ -134,12 +135,12 @@ class GroupMeBot(object):
         :param text: message text
         """
         points_to = match.group(1).rstrip()
-        points_to = match.group(1).lstrip()
-        points_to = match.group(1).lstrip('@')
+        points_to = points_to.lstrip()
+        points_to = points_to.lstrip('@')
 
-        what_for = match.group(3).rstrip()
-        what_for = match.group(3).lstrip(' for ')
-        what_for = match.group(3).lstrip(' because ')
+        what_for = match.group(3).lstrip()
+        what_for = what_for.lstrip('for ')
+        what_for = what_for.lstrip('because ')
 
         if len(points_to) > 0:
             log.info('MATCH: minusminus to {} in {}.'.format(points_to,
@@ -473,7 +474,7 @@ class RipDB(object):
         sql = 'SELECT * FROM rip_users WHERE id={}'
 
         try:
-            log.info(repr(id))
+            log.info('MESSAGE: ' + repr(id))
             self.cur.execute(sql.format(id))
             ret = self.cur.fetchone()
 
