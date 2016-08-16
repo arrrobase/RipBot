@@ -133,7 +133,10 @@ class GroupMeBot(object):
         :param text: message text
         """
         points_to = match.group(1).rstrip()
+        points_to = match.group(1).lstrip('@')
+
         what_for = match.group(2).lstrip(' for ')
+        what_for = match.group(2).lstrip(' because ')
 
         if len(points_to) > 0:
             log.info('MATCH: minusminus to {} in {}.'.format(points_to,
