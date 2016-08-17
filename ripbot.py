@@ -315,7 +315,7 @@ class RipDB(object):
             sql = "SELECT points FROM rip_users WHERE id={}"
 
         else:
-            sql = "SELECT points FROM rip_users WHERE name='{}'"
+            sql = "SELECT points FROM rip_users WHERE LOWER(name)=LOWER('{}')"
 
         if self.con is not None:
             try:
@@ -349,7 +349,8 @@ class RipDB(object):
             sql = "UPDATE rip_users SET points = points + 1 WHERE id={}"
 
         else:
-            sql = "UPDATE rip_users SET points = points + 1 WHERE name='{}'"
+            sql = "UPDATE rip_users SET points = points + 1 WHERE " \
+                  "LOWER(name)=('{}')"
 
         if self.con is not None:
             try:
@@ -378,7 +379,8 @@ class RipDB(object):
             sql = "UPDATE rip_users SET points = points - 1 WHERE id={}"
 
         else:
-            sql = "UPDATE rip_users SET points = points - 1 WHERE name='{}'"
+            sql = "UPDATE rip_users SET points = points - 1 WHERE " \
+                  "LOWER(name)=LOWER('{}')"
 
         if self.con is not None:
             try:
@@ -405,10 +407,10 @@ class RipDB(object):
         :return:
         """
         if type(id) == int:
-            sql = "UPDATE rip_users SET name='{}' where id={}"
+            sql = "UPDATE rip_users SET name='{}' WHERE id={}"
 
         else:
-            sql = "UPDATE rip_users SET name='{}' where name='{}'"
+            sql = "UPDATE rip_users SET name='{}' WHERE LOWER(name)=LOWER('{}')"
 
         if self.con is not None:
             try:
