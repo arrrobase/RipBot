@@ -77,7 +77,7 @@ class GroupMeBot(object):
                     log.info('No matches; ignoring.')
 
         # non system messages not originating from ripbot
-        elif name is not None and name != 'temp-ripbot':
+        elif name is not None and name != 'ripbot':
             log.info('BOT: Got user message, parsing...')
 
             if text is not None:
@@ -105,8 +105,8 @@ class GroupMeBot(object):
         points_to = points_to.lstrip('@')
 
         what_for = match.group(3).lstrip().rstrip()
-        what_for = what_for.lstrip('for').lstrip()
-        what_for = what_for.lstrip('because').lstrip()
+        what_for = re.sub(r"^for", '', what_for)
+        what_for = re.sub(r"^because", '', what_for)
 
         if len(points_to) > 0:
             log.info('MATCH: plusplus to {} in {}.'.format(points_to,
@@ -139,8 +139,8 @@ class GroupMeBot(object):
         points_to = points_to.lstrip('@')
 
         what_for = match.group(3).lstrip().rstrip()
-        what_for = what_for.lstrip('for').lstrip()
-        what_for = what_for.lstrip('because').lstrip()
+        what_for = re.sub(r"^for", '', what_for)
+        what_for = re.sub(r"^because", '', what_for)
 
         if len(points_to) > 0:
             log.info('MATCH: minusminus to {} in {}.'.format(points_to,
