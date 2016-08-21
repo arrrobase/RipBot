@@ -536,7 +536,7 @@ if __name__ == '__main__':
 
     # initialize giphy
     giphy = Giphy()
-    gif = Giphy.random
+    gif = giphy.random
 
     # init callbacks
     server.setup()
