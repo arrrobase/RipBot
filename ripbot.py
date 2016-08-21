@@ -77,7 +77,7 @@ class GroupMeBot(object):
                     log.info('No matches; ignoring.')
 
         # non system messages not originating from ripbot
-        elif name is not None and name != 'ripbot':
+        elif name is not None and name != which_bot:
             log.info('BOT: Got user message, parsing...')
 
             if text is not None:
@@ -530,12 +530,12 @@ if __name__ == '__main__':
     config.API_KEY = key
 
     # which bot to use
-    which_bot = 'ripbot'
+    which_bot = 'test-ripbot'
     bot = Bot.list().filter(name=which_bot)[0]
 
     # bot's groupme
     # which_group = 'Bow City'
-    group_id = '13678029'
+    group_id = '23373961'
 
     # start server
     server = RipbotServer()
