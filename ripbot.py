@@ -138,7 +138,7 @@ class GroupMeBot(object):
         :param match: re match groups
         :param text: message text
         """
-        query = match.group(1)
+        query = match.group(1).rstrip()
 
         if len(query) > 0:
             log.info('MATCH: gifme in {}.'.format(text))
