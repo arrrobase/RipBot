@@ -517,14 +517,18 @@ if __name__ == '__main__':
 
     config.API_KEY = key
 
-    # which bot to use
-    # which_bot = 'test-ripbot'  # test
-    which_bot = 'ripbot'  # rip
-    bot = Bot.list().filter(name=which_bot)[0]
+    is_test = os.environ.get('IS_TEST', False)
 
-    # bot's groupme
-    # group_id = '23373961'  # test
-    group_id = '13678029'  # rip
+    # which bot to use
+    if is_test:
+        which_bot = 'test-ripbot'
+        group_id = '23373961'
+
+    else:
+        which_bot = 'ripbot'
+        group_id = '13678029'
+
+    bot = Bot.list().filter(name=which_bot)[0]
 
     # start server
     server = RipbotServer()
