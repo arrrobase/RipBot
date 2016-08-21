@@ -9,6 +9,7 @@ from __future__ import print_function
 
 from groupy import Bot, Group, config
 from flask import Flask, request
+from safygiphy import Giphy
 import logging
 import signal
 
@@ -64,8 +65,8 @@ class GroupMeBot(object):
             log.info('BOT: Got system message, parsing...')
 
             if text is not None:
-                new_user = re.match('(.*?) added (.*?) to the group', text)
-                name_change = re.match('(.*?) changed name to (.*)', text)
+                new_user = re.match('(.*) added (.*) to the group', text)
+                name_change = re.match('(.*) changed name to (.*)', text)
 
                 if new_user is not None:
                     self.is_new_user(new_user)
@@ -83,23 +84,24 @@ class GroupMeBot(object):
             if text is not None:
                 # matches string in format: '@First Last ++ more text'
                 plus_minus = re.match('^(.*?)(\+\+|\-\-)(.*)', text)
+                gifme = re.match('^(?:@)?(?:ripbot)?(?: )?gifme (.*)', text)
 
                 if plus_minus is not None:
-                    if plus_minus.group(2) == '++':
-                        self.is_plusplus(plus_minus, text)
+                    self.is_plusminus(plus_minus, text)
 
-                    elif plus_minus.group(2) == '--':
-                        self.is_minusminus(plus_minus, text)
+                if gifme is not None:
+                    self.is_gifme(gifme, text)
 
                 else:
                     log.info('No matches; ignoring.')
 
-    def is_plusplus(self, match, text):
+    def is_plusminus(self, match, text):
         """
-        Response for adding points
+        Response for adding/subtracting points
         :param match: re match groups
         :param text: message text
         """
+        plus_or_minus = match.group(2)
         points_to = match.group(1).rstrip()
         points_to = points_to.lstrip()
         points_to = points_to.lstrip('@')
@@ -108,10 +110,13 @@ class GroupMeBot(object):
         what_for = re.sub(r"^(for|because)", '', what_for).lstrip()
 
         if len(points_to) > 0:
-            log.info('MATCH: plusplus to {} in {}.'.format(points_to,
+            log.info('MATCH: plusminus to {} in {}.'.format(points_to,
                                                            text))
 
-            points = rip_db.add_point(points_to)
+            if plus_or_minus == '++':
+                points = rip_db.add_point(points_to)
+            elif plus_or_minus == '--':
+                points = rip_db.sub_point(points_to)
 
             post_text = '{} now has {} point'
 
@@ -127,36 +132,18 @@ class GroupMeBot(object):
 
             self.post(post_text)
 
-    def is_minusminus(self, match, text):
+    def is_gifme(self, match, text):
         """
-        Response for subtracting points
+        Response for querying a gif. Uses GiphyAPI.
         :param match: re match groups
         :param text: message text
         """
-        points_to = match.group(1).rstrip()
-        points_to = points_to.lstrip()
-        points_to = points_to.lstrip('@')
+        query = match.group(1)
 
-        what_for = match.group(3).lstrip().rstrip()
-        what_for = re.sub(r"^(for|because)", '', what_for).lstrip()
+        if len(query) > 0:
+            log.info('MATCH: gifme in {}.'.format(text))
 
-        if len(points_to) > 0:
-            log.info('MATCH: minusminus to {} in {}.'.format(points_to,
-                                                             text))
-
-            points = rip_db.sub_point(points_to)
-
-            post_text = '{} now has {} point'
-
-            if points != 1:
-                post_text += 's'
-
-            if what_for:
-                post_text += ', most recently for {}.'
-                post_text = post_text.format(points_to, points, what_for)
-            else:
-                post_text += '.'
-                post_text = post_text.format(points_to, points)
+            post_text = gif(query)
 
             self.post(post_text)
 
@@ -546,6 +533,10 @@ if __name__ == '__main__':
 
     # initialize database class
     rip_db = RipDB()
+
+    # initialize giphy
+    giphy = Giphy()
+    gif = Giphy.random
 
     # init callbacks
     server.setup()
