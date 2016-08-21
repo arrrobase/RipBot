@@ -84,7 +84,8 @@ class GroupMeBot(object):
             if text is not None:
                 # matches string in format: '@First Last ++ more text'
                 plus_minus = re.match('^(.*?)(\+\+|\-\-)(.*)', text)
-                gifme = re.match('^(?:@)?(?:ripbot)?(?: )?gifme (.*)', text)
+                gifme = re.match('^(?:@)?(?:ripbot)?(?: )?gifme (.*)', text,
+                                 re.IGNORECASE)
 
                 if plus_minus is not None:
                     self.is_plusminus(plus_minus, text)
