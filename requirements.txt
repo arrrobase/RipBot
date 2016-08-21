@@ -1,3 +1,4 @@
 flask
 GroupyAPI
 psycopg2
+safygiphy
