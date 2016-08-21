@@ -143,7 +143,7 @@ class GroupMeBot(object):
         if len(query) > 0:
             log.info('MATCH: gifme in {}.'.format(text))
 
-            post_text = gif(query)
+            post_text = gif(tag=query)['data']['image_url']
 
             self.post(post_text)
 
