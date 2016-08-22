@@ -338,7 +338,7 @@ class RipDB(object):
 
         else:
             sql = "UPDATE rip_users SET points = points + 1 WHERE " \
-                  "LOWER(name)=('{}')"
+                  "LOWER(name)=LOWER('{}')"
 
         if self.con is not None:
             try:
