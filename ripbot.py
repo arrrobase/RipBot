@@ -86,12 +86,17 @@ class GroupMeBot(object):
                 plus_minus = re.match('^(.*?)(\+\+|\-\-)(.*)', text)
                 gifme = re.match('^(?:@)?(?:ripbot)?(?: )?gifme (.*)', text,
                                  re.IGNORECASE)
+                top_scores = re.match('^(?:@)?(?:ripbot) topscores',
+                                      text, re.IGNORECASE)
 
                 if plus_minus is not None:
                     self.is_plusminus(plus_minus, text)
 
                 if gifme is not None:
                     self.is_gifme(gifme, text)
+
+                if top_scores is not None:
+                    self.is_top_scores()
 
                 else:
                     log.info('No matches; ignoring.')
@@ -109,10 +114,11 @@ class GroupMeBot(object):
 
         what_for = match.group(3).lstrip().rstrip()
         what_for = re.sub(r"^(for|because)", '', what_for).lstrip()
+        what_for = what_for.lstrip('.!?')
 
         if len(points_to) > 0:
-            log.info('MATCH: plusminus to {} in {}.'.format(points_to,
-                                                           text))
+            log.info('MATCH: plusminus to {} in "{}".'.format(points_to,
+                                                              text))
 
             if plus_or_minus == '++':
                 points = rip_db.add_point(points_to)
@@ -147,6 +153,26 @@ class GroupMeBot(object):
             post_text = gif(tag=query)['data']['image_url']
 
             self.post(post_text)
+
+    def is_top_scores(self):
+        """
+        Response for querying a gif. Uses GiphyAPI.
+        :param match: re match groups
+        :param text: message text
+        """
+
+        top_scores = rip_db.get_top_scores()
+
+        post_text = '>Top 10 scores:\n'
+
+        for i, score in enumerate(top_scores):
+            post_text += '\n{}. '.format(i+1)
+            post_text += '{}'.format(top_scores[i][0])
+            post_text += ' with {} point'.format(top_scores[i][1])
+            if top_scores[i][1] != 1:
+                post_text += 's'
+
+        self.post(post_text)
 
     def is_new_user(self, match):
         """
@@ -386,6 +412,25 @@ class RipDB(object):
 
         else:
             log.error('Failed adding points: not connected to DB.')
+
+    def get_top_scores(self):
+        """
+        Gets top 10 scorers
+        :return:
+        """
+        sql = 'SELECT name, points FROM rip_users ORDER BY points DESC LIMIT 10'
+
+        if self.con is not None:
+            try:
+                self.cur.execute(sql)
+                top_scores = self.cur.fetchall()
+
+                return top_scores
+
+            except psycopg2.DatabaseError as e:
+                self.con.rollback()
+                log.error(e)
+
 
     def change_player_name(self, new_name, id):
         """
