@@ -88,6 +88,8 @@ class GroupMeBot(object):
                                  re.IGNORECASE)
                 top_scores = re.match('^(?:@)?(?:ripbot) topscores',
                                       text, re.IGNORECASE)
+                bottom_scores = re.match('^(?:@)?(?:ripbot) bottomscores',
+                                      text, re.IGNORECASE)
 
                 if plus_minus is not None:
                     self.is_plusminus(plus_minus, text)
@@ -97,6 +99,9 @@ class GroupMeBot(object):
 
                 if top_scores is not None:
                     self.is_top_scores()
+
+                if bottom_scores is not None:
+                    self.is_top_scores(False)
 
                 else:
                     log.info('No matches; ignoring.')
@@ -154,16 +159,20 @@ class GroupMeBot(object):
 
             self.post(post_text)
 
-    def is_top_scores(self):
+    def is_top_scores(self, top=True):
         """
         Response for querying a gif. Uses GiphyAPI.
         :param match: re match groups
         :param text: message text
         """
 
-        top_scores = rip_db.get_top_scores()
 
-        post_text = '>Top 10 scores:\n'
+        if top:
+            top_scores = rip_db.get_top_scores()
+            post_text = '>Top 10 scores:\n'
+        else:
+            top_scores = rip_db.get_top_scores(False)
+            post_text = '>Bottom 10 scores:\n'
 
         for i, score in enumerate(top_scores):
             post_text += '\n{}. '.format(i+1)
@@ -413,12 +422,15 @@ class RipDB(object):
         else:
             log.error('Failed adding points: not connected to DB.')
 
-    def get_top_scores(self):
+    def get_top_scores(self, top=True):
         """
         Gets top 10 scorers
         :return:
         """
-        sql = 'SELECT name, points FROM rip_users ORDER BY points DESC LIMIT 10'
+        if top:
+            sql = 'SELECT name, points FROM rip_users ORDER BY points DESC LIMIT 10'
+        else:
+            sql = 'SELECT name, points FROM rip_users ORDER BY points ASC LIMIT 10'
 
         if self.con is not None:
             try:
