@@ -167,7 +167,7 @@ class GroupMeBot(object):
 
         for i, score in enumerate(top_scores):
             post_text += '\n{}. '.format(i+1)
-            post_text += '{}'.format(top_scores[i][0])
+            post_text += '{}'.format(top_scores[i][0].lower().title())
             post_text += ' with {} point'.format(top_scores[i][1])
             if top_scores[i][1] != 1:
                 post_text += 's'
