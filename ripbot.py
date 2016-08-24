@@ -98,7 +98,7 @@ class GroupMeBot(object):
                     self.is_gifme(gifme, text)
 
                 if top_scores is not None:
-                    self.is_top_scores()
+                    self.is_top_scores(text)
 
                 if bottom_scores is not None:
                     self.is_top_scores(False)
@@ -159,13 +159,13 @@ class GroupMeBot(object):
 
             self.post(post_text)
 
-    def is_top_scores(self, top=True):
+    def is_top_scores(self, text, top=True):
         """
         Response for querying a gif. Uses GiphyAPI.
         :param match: re match groups
         :param text: message text
         """
-
+        log.info('MATCH: topscores in "{}".'.format(text))
 
         if top:
             top_scores = rip_db.get_top_scores()
@@ -431,6 +431,8 @@ class RipDB(object):
             sql = 'SELECT name, points FROM rip_users ORDER BY points DESC LIMIT 10'
         else:
             sql = 'SELECT name, points FROM rip_users ORDER BY points ASC LIMIT 10'
+
+        log.info('DB: getting top/bottom scorers.')
 
         if self.con is not None:
             try:
