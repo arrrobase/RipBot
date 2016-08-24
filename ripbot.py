@@ -176,7 +176,15 @@ class GroupMeBot(object):
 
         for i, score in enumerate(top_scores):
             post_text += '\n{}. '.format(i+1)
-            post_text += '{}'.format(top_scores[i][0].lower().title())
+
+            # capitalize if only 2 letters (as in AT, KP)
+            # need better way to check this. Original entry in DB is
+            # unreliable though so idk.
+            if len(top_scores[i][0]) == 2:
+                post_text += '{}'.format(top_scores[i][0].upper())
+            else:
+                post_text += '{}'.format(top_scores[i][0].lower().title())
+
             post_text += ' with {} point'.format(top_scores[i][1])
             if top_scores[i][1] != 1:
                 post_text += 's'
