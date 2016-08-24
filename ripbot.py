@@ -161,8 +161,8 @@ class GroupMeBot(object):
 
     def is_top_scores(self, text, top=True):
         """
-        Response for querying a gif. Uses GiphyAPI.
-        :param match: re match groups
+        Response for querying top or bottom scorers.
+
         :param text: message text
         """
         log.info('MATCH: topscores in "{}".'.format(text))
