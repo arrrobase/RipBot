@@ -101,7 +101,7 @@ class GroupMeBot(object):
                     self.is_top_scores(text)
 
                 if bottom_scores is not None:
-                    self.is_top_scores(False)
+                    self.is_top_scores(text, False)
 
                 else:
                     log.info('No matches; ignoring.')
