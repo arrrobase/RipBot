@@ -224,7 +224,8 @@ class GroupMeBot(object):
 
             # check if user already in DB
             if not rip_db.exists(user_id):
-                log.warning('DB: user not found in DB but should have been.')
+                log.warning('DB: user not found in DB but should have been. '
+                            'Probably does not have any points yet.')
                 return
 
         except IndexError:  # fallback to switching by name rather than user_id
