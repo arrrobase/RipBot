@@ -101,7 +101,7 @@ class GroupMeBot(object):
                     self.is_top_scores(text)
 
                 if bottom_scores is not None:
-                    self.is_top_scores(False)
+                    self.is_top_scores(text, False)
 
                 else:
                     log.info('No matches; ignoring.')
@@ -161,8 +161,8 @@ class GroupMeBot(object):
 
     def is_top_scores(self, text, top=True):
         """
-        Response for querying a gif. Uses GiphyAPI.
-        :param match: re match groups
+        Response for querying top or bottom scorers.
+
         :param text: message text
         """
         log.info('MATCH: topscores in "{}".'.format(text))
@@ -176,7 +176,15 @@ class GroupMeBot(object):
 
         for i, score in enumerate(top_scores):
             post_text += '\n{}. '.format(i+1)
-            post_text += '{}'.format(top_scores[i][0].lower().title())
+
+            # capitalize if only 2 letters (as in AT, KP)
+            # need better way to check this. Original entry in DB is
+            # unreliable though so idk.
+            if len(top_scores[i][0]) == 2:
+                post_text += '{}'.format(top_scores[i][0].upper())
+            else:
+                post_text += '{}'.format(top_scores[i][0].lower().title())
+
             post_text += ' with {} point'.format(top_scores[i][1])
             if top_scores[i][1] != 1:
                 post_text += 's'
