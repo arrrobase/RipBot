@@ -155,7 +155,16 @@ class GroupMeBot(object):
         if len(query) > 0:
             log.info('MATCH: gifme in {}.'.format(text))
 
-            post_text = gif(tag=query)['data']['image_url']
+            try:
+                post_text = gif(tag=query)['data']['image_url']
+            except (TypeError, IndexError):
+                post_text = 'Sorry, no gifs matching those tags.'
+
+            try:
+                sorry = gif(tag='sorry')['data']['image_url']
+                self.post(sorry)
+            except:
+                pass
 
             self.post(post_text)
 
