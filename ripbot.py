@@ -160,13 +160,13 @@ class GroupMeBot(object):
             except (TypeError, IndexError):
                 post_text = 'Sorry, no gifs matching those tags.'
 
+            self.post(post_text)
+
             try:
                 sorry = gif(tag='sorry')['data']['image_url']
                 self.post(sorry)
             except:
                 pass
-
-            self.post(post_text)
 
     def is_top_scores(self, text, top=True):
         """
