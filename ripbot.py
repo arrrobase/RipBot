@@ -151,6 +151,7 @@ class GroupMeBot(object):
         :param text: message text
         """
         query = match.group(1).rstrip()
+        sorry = None
 
         if len(query) > 0:
             log.info('MATCH: gifme in {}.'.format(text))
@@ -160,13 +161,14 @@ class GroupMeBot(object):
             except (TypeError, IndexError):
                 post_text = 'Sorry, no gifs matching those tags.'
 
-            self.post(post_text)
+                try:
+                    sorry = gif(tag='sorry')['data']['image_url']
+                except:
+                    pass
 
-            try:
-                sorry = gif(tag='sorry')['data']['image_url']
+            self.post(post_text)
+            if sorry is not None:
                 self.post(sorry)
-            except:
-                pass
 
     def is_top_scores(self, text, top=True):
         """
