@@ -230,7 +230,7 @@ class GroupMeBot(object):
 
     def why(self):
         post_text = "Because he likes Chipotle..."
-        self.post(post_test)
+        self.post(post_text)
 
     def is_new_user(self, match):
         """
