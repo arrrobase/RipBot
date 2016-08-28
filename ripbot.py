@@ -94,7 +94,7 @@ class GroupMeBot(object):
                 bottom_scores = re.match('^(?:@)?(?:ripbot) bottomscores',
                                       text, re.IGNORECASE)
 
-                who = re.match('^(?:@)?(?:ripbot) who is', text, re.IGNORECASE)
+                who = re.match('^(?:@)?(?:ripbot) who', text, re.IGNORECASE)
 
                 if plus_minus is not None:
                     self.is_plusminus(plus_minus, text)
