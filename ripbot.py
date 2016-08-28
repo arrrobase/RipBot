@@ -224,8 +224,9 @@ class GroupMeBot(object):
 
     def who_is(self):
         member = Group.list().filter(group_id=group_id)[0].members()
-        print(member)
-        post_text = 'Signs Point to ' + random.choice(member).nickname
+        intro = ['Signs Point to ', 'Looks like ', 'Winner is ', 'I think it was ']
+
+        post_text = random.choice(intro) + random.choice(member).nickname
         self.post(post_text)
 
     def why(self):
