@@ -96,6 +96,8 @@ class GroupMeBot(object):
 
                 who = re.match('^(?:@)?(?:ripbot) who', text, re.IGNORECASE)
 
+                why = re.match('^(?:@)?(?:ripbot) why', text, re.IGNORECASE)
+
                 if plus_minus is not None:
                     self.is_plusminus(plus_minus, text)
 
@@ -222,6 +224,10 @@ class GroupMeBot(object):
 
         post_text = 'Signs Point to @KP'
         self.post(post_text)
+
+    def why(self):
+        post_text = "Because he likes Chipotle..."
+        self.post(post_test)
 
     def is_new_user(self, match):
         """
