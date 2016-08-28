@@ -85,13 +85,13 @@ class GroupMeBot(object):
             if text is not None:
                 # matches string in format: '@First Last ++ more text'
                 plus_minus = re.match('^(.*?)(\+\+|\-\-)(.*)', text)
-                
+
                 gifme = re.match('^(?:@)?(?:ripbot)?(?: )?gifme (.*)', text,
                                  re.IGNORECASE)
-                
+
                 top_scores = re.match('^(?:@)?(?:ripbot) topscores',
                                       text, re.IGNORECASE)
-                
+
                 bottom_scores = re.match('^(?:@)?(?:ripbot) bottomscores',
                                          text, re.IGNORECASE)
 
@@ -178,16 +178,14 @@ class GroupMeBot(object):
             log.info('MATCH: gifme in {}.'.format(text))
 
             try:
-<<<<<<< HEAD
                 post_text = gif(tag=query, rating='r')['data']['image_url']
-=======
-                post_text = gif(tag=query,rating='r')['data']['image_url']
->>>>>>> e9ef841e22b09dde6dabc5b6994ae06110e96bbc
+
             except (TypeError, IndexError):
                 post_text = 'Sorry, no gifs matching those tags.'
 
                 try:
                     sorry = gif(tag='sorry')['data']['image_url']
+                    
                 except:
                     pass
 
