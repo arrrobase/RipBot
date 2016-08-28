@@ -20,6 +20,7 @@ import json
 import sys
 import os
 import re
+import random
 
 
 class GroupMeBot(object):
@@ -84,12 +85,19 @@ class GroupMeBot(object):
             if text is not None:
                 # matches string in format: '@First Last ++ more text'
                 plus_minus = re.match('^(.*?)(\+\+|\-\-)(.*)', text)
+                
                 gifme = re.match('^(?:@)?(?:ripbot)?(?: )?gifme (.*)', text,
                                  re.IGNORECASE)
+                
                 top_scores = re.match('^(?:@)?(?:ripbot) topscores',
                                       text, re.IGNORECASE)
+                
                 bottom_scores = re.match('^(?:@)?(?:ripbot) bottomscores',
                                          text, re.IGNORECASE)
+
+                who = re.match('^(?:@)?(?:ripbot) who', text, re.IGNORECASE)
+
+                why = re.match('^(?:@)?(?:ripbot) why', text, re.IGNORECASE)
 
                 if plus_minus is not None:
                     self.is_plusminus(plus_minus, text)
@@ -102,6 +110,12 @@ class GroupMeBot(object):
 
                 if bottom_scores is not None:
                     self.is_top_scores(text, False)
+
+                if who is not None:
+                    self.who_is()
+
+                if why is not None:
+                    self.why()
 
                 else:
                     log.info('No matches; ignoring.')
@@ -132,7 +146,10 @@ class GroupMeBot(object):
                     points = rip_db.add_point(points_to)
 
             elif plus_or_minus == '--':
-                points = rip_db.sub_point(points_to)
+                if points_to.lower() == 'baja fresh':
+                    points = rip_db.add_point(points_to)
+                else:
+                    points = rip_db.sub_point(points_to)
 
             post_text = '{} now has {} point'
 
@@ -161,7 +178,11 @@ class GroupMeBot(object):
             log.info('MATCH: gifme in {}.'.format(text))
 
             try:
+<<<<<<< HEAD
                 post_text = gif(tag=query, rating='r')['data']['image_url']
+=======
+                post_text = gif(tag=query,rating='r')['data']['image_url']
+>>>>>>> e9ef841e22b09dde6dabc5b6994ae06110e96bbc
             except (TypeError, IndexError):
                 post_text = 'Sorry, no gifs matching those tags.'
 
@@ -205,6 +226,27 @@ class GroupMeBot(object):
                 post_text += 's'
 
         self.post(post_text)
+
+    def who_is(self):
+        member = Group.list().filter(group_id=group_id)[0].members()
+        intro = ['Signs Point to ', 'Looks like ', 'Winner is ', 'I think it was ']
+
+        post_text = random.choice(intro) + random.choice(member).nickname
+        self.post(post_text)
+
+    def why(self):
+        reasons = [
+            'Because he met the Iron Man out of costume.',
+            'Because his dinner isn\'t ready',
+            'Because someone flushed his poop before he could look at it',
+            'Because he likes Chipotle... and didn\'t even plus plus it',
+            'Because his cat downloaded all of that child porn',
+            'Because he is from Texas',
+            'Because he is from Idaho',
+            'Because @AT made him do it'
+        ]
+
+        self.post(random.choice(reasons))
 
     def is_new_user(self, match):
         """
