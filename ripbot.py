@@ -223,7 +223,7 @@ class GroupMeBot(object):
         self.post(post_text)
 
     def who_is(self):
-        member = Group.list().filter(name=which_group)[0].members()
+        member = Group.list().filter(group_id=group_id)[0].members()
         post_text = 'Signs Point to ' + print(random.choice(member))
         self.post(post_text)
 
