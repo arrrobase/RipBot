@@ -231,13 +231,11 @@ class GroupMeBot(object):
 
     def why(self):
         reasons = [
-            'Because he met the Iron Man out of costume.',
             'Because his dinner isn\'t ready',
             'Because someone flushed his poop before he could look at it',
             'Because he likes Chipotle... and didn\'t even plus plus it',
             'Because his cat downloaded all of that child porn',
             'Because he is from Texas',
-            'Because he is from Idaho',
             'Because @AT made him do it'
         ]
 
