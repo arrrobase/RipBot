@@ -20,6 +20,7 @@ import json
 import sys
 import os
 import re
+import random
 
 
 class GroupMeBot(object):
@@ -222,10 +223,8 @@ class GroupMeBot(object):
         self.post(post_text)
 
     def who_is(self):
-        # member = Group.list().filter(name=which_group)[0].members()
-
-
-        post_text = 'Signs Point to @KP'
+        member = Group.list().filter(name=which_group)[0].members()
+        post_text = 'Signs Point to ' + print(random.choice(member))
         self.post(post_text)
 
     def why(self):
