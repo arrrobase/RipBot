@@ -113,6 +113,9 @@ class GroupMeBot(object):
                 if who is not None:
                     self.who_is()
 
+                if why is not None:
+                    self.why()
+
                 else:
                     log.info('No matches; ignoring.')
 
