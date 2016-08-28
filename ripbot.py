@@ -229,7 +229,7 @@ class GroupMeBot(object):
         self.post(post_text)
 
     def why(self):
-        post_text = "Because he likes Chipotle..."
+        post_text = "Because he likes Chipotle... and didn't even plus plus it"
         self.post(post_text)
 
     def is_new_user(self, match):
