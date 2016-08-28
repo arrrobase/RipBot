@@ -171,7 +171,7 @@ class GroupMeBot(object):
             log.info('MATCH: gifme in {}.'.format(text))
 
             try:
-                post_text = gif(tag=query)['data']['image_url']
+                post_text = gif(tag=query,rating='r')['data']['image_url']
             except (TypeError, IndexError):
                 post_text = 'Sorry, no gifs matching those tags.'
 
@@ -216,9 +216,9 @@ class GroupMeBot(object):
 
         self.post(post_text)
 
-    def who_is():
+    def who_is(self):
         # member = Group.list().filter(name=which_group)[0].members()
-        
+
 
         post_text = 'Signs Point to @KP'
         self.post(post_text)
