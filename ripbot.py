@@ -89,7 +89,7 @@ class GroupMeBot(object):
                 top_scores = re.match('^(?:@)?(?:ripbot) topscores',
                                       text, re.IGNORECASE)
                 bottom_scores = re.match('^(?:@)?(?:ripbot) bottomscores',
-                                      text, re.IGNORECASE)
+                                         text, re.IGNORECASE)
 
                 if plus_minus is not None:
                     self.is_plusminus(plus_minus, text)
@@ -130,6 +130,7 @@ class GroupMeBot(object):
                     points = rip_db.sub_point(points_to)
                 else:
                     points = rip_db.add_point(points_to)
+
             elif plus_or_minus == '--':
                 points = rip_db.sub_point(points_to)
 
@@ -160,7 +161,7 @@ class GroupMeBot(object):
             log.info('MATCH: gifme in {}.'.format(text))
 
             try:
-                post_text = gif(tag=query)['data']['image_url']
+                post_text = gif(tag=query, rating='r')['data']['image_url']
             except (TypeError, IndexError):
                 post_text = 'Sorry, no gifs matching those tags.'
 
