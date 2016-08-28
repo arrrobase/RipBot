@@ -131,7 +131,10 @@ class GroupMeBot(object):
                 else:
                     points = rip_db.add_point(points_to)
             elif plus_or_minus == '--':
-                points = rip_db.sub_point(points_to)
+                if points_to.lower() == 'baja fresh':
+                    points = rip_db.add_point(points_to)
+                else:
+                    points = rip_db.sub_point(points_to)
 
             post_text = '{} now has {} point'
 
