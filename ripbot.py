@@ -126,7 +126,10 @@ class GroupMeBot(object):
                                                               text))
 
             if plus_or_minus == '++':
-                points = rip_db.add_point(points_to)
+                if points_to.to_lower == 'chipotle'
+                    points = rip_db.sub_point(points_to)
+                else
+                    points = rip_db.add_point(points_to)
             elif plus_or_minus == '--':
                 points = rip_db.sub_point(points_to)
 
