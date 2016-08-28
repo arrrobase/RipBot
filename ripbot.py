@@ -84,12 +84,17 @@ class GroupMeBot(object):
             if text is not None:
                 # matches string in format: '@First Last ++ more text'
                 plus_minus = re.match('^(.*?)(\+\+|\-\-)(.*)', text)
+                
                 gifme = re.match('^(?:@)?(?:ripbot)?(?: )?gifme (.*)', text,
                                  re.IGNORECASE)
+                
                 top_scores = re.match('^(?:@)?(?:ripbot) topscores',
                                       text, re.IGNORECASE)
+                
                 bottom_scores = re.match('^(?:@)?(?:ripbot) bottomscores',
                                       text, re.IGNORECASE)
+
+                who = re.match('^(?:@)?(?:ripbot) who is', text, re.IGNORECASE)
 
                 if plus_minus is not None:
                     self.is_plusminus(plus_minus, text)
@@ -102,6 +107,9 @@ class GroupMeBot(object):
 
                 if bottom_scores is not None:
                     self.is_top_scores(text, False)
+
+                if who is not None:
+                    self.who_is()
 
                 else:
                     log.info('No matches; ignoring.')
@@ -206,6 +214,13 @@ class GroupMeBot(object):
             if top_scores[i][1] != 1:
                 post_text += 's'
 
+        self.post(post_text)
+
+    def who_is():
+        # member = Group.list().filter(name=which_group)[0].members()
+        
+
+        post_text = 'Signs Point to @KP'
         self.post(post_text)
 
     def is_new_user(self, match):
