@@ -131,17 +131,6 @@ class GroupMeBot(object):
         points_to = points_to.lstrip()
         points_to = points_to.lstrip('@')
 
-        # see if points_to is a person, get groupme ID if so
-        try:
-            member = Group.list().filter(
-                group_id=group_id)[0].members().filter(nickname=points_to)[0]
-
-            points_to = int(member.user_id)
-            log.info('GROUPY: Converted name to ID')
-
-        except(TypeError, IndexError) as e:
-            log.error('{} for name "{}.'.format(e, points_to))
-
         what_for = match.group(3).lstrip().rstrip()
         what_for = re.sub(r"^(for|because)", '', what_for).lstrip()
         what_for = what_for.rstrip('.!?')
@@ -456,6 +445,17 @@ class RipDB(object):
         :param id: player name or id
         :return: players points as int
         """
+        # see if points_to is a person, get groupme ID if so
+        try:
+            member = Group.list().filter(
+                group_id=group_id)[0].members().filter(nickname=id)[0]
+
+            id = int(member.user_id)
+            log.info('GROUPY: Converted name to ID')
+
+        except(TypeError, IndexError) as e:
+            log.error('{} for name "{}.'.format(e, id))
+
         if type(id) == int:
             sql = "UPDATE rip_users SET points = points + 1 WHERE id={}"
 
@@ -486,6 +486,17 @@ class RipDB(object):
         :param id: player name or id
         :return: players points as int
         """
+        # see if points_to is a person, get groupme ID if so
+        try:
+            member = Group.list().filter(
+                group_id=group_id)[0].members().filter(nickname=id)[0]
+
+            id = int(member.user_id)
+            log.info('GROUPY: Converted name to ID')
+
+        except(TypeError, IndexError) as e:
+            log.error('{} for name "{}.'.format(e, id))
+
         if type(id) == int:
             sql = "UPDATE rip_users SET points = points - 1 WHERE id={}"
 
