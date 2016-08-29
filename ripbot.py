@@ -89,15 +89,15 @@ class GroupMeBot(object):
                 gifme = re.match('^(?:@)?(?:ripbot)?(?: )?gifme (.*)', text,
                                  re.IGNORECASE)
 
-                top_scores = re.match('^(?:@)?(?:ripbot) topscores',
+                top_scores = re.match('^(?:@)?(?:ripbot )?topscores$',
                                       text, re.IGNORECASE)
 
-                bottom_scores = re.match('^(?:@)?(?:ripbot) bottomscores',
+                bottom_scores = re.match('^(?:@)?(?:ripbot )?bottomscores',
                                          text, re.IGNORECASE)
 
-                who = re.match('^(?:@)?(?:ripbot) who', text, re.IGNORECASE)
+                who = re.match('^(?:@)?(?:ripbot )who', text, re.IGNORECASE)
 
-                why = re.match('^(?:@)?(?:ripbot) why', text, re.IGNORECASE)
+                why = re.match('^(?:@)?(?:ripbot )why', text, re.IGNORECASE)
 
                 if plus_minus is not None:
                     self.is_plusminus(plus_minus, text)
@@ -106,16 +106,16 @@ class GroupMeBot(object):
                     self.is_gifme(gifme, text)
 
                 if top_scores is not None:
-                    self.is_top_scores(text)
+                    self.is_scores(text)
 
                 if bottom_scores is not None:
-                    self.is_top_scores(text, False)
+                    self.is_scores(text, False)
 
                 if who is not None:
-                    self.who_is()
+                    self.is_who()
 
                 if why is not None:
-                    self.why()
+                    self.is_why()
 
                 else:
                     log.info('No matches; ignoring.')
@@ -130,6 +130,15 @@ class GroupMeBot(object):
         points_to = match.group(1).rstrip()
         points_to = points_to.lstrip()
         points_to = points_to.lstrip('@')
+
+        # see if points_to is a person, get groupme ID if so
+        try:
+            id = Group.list().filter(group_id=group_id)[0].members().filter(
+                nickname=id)[0]
+            points_to = int(id)
+
+        except(TypeError, IndexError):
+            pass
 
         what_for = match.group(3).lstrip().rstrip()
         what_for = re.sub(r"^(for|because)", '', what_for).lstrip()
@@ -193,11 +202,12 @@ class GroupMeBot(object):
             if sorry is not None:
                 self.post(sorry)
 
-    def is_top_scores(self, text, top=True):
+    def is_scores(self, text, top=True):
         """
         Response for querying top or bottom scorers.
 
         :param text: message text
+        :param top: bool, True if want top scores, False for bottom
         """
         log.info('MATCH: topscores in "{}".'.format(text))
 
@@ -225,14 +235,26 @@ class GroupMeBot(object):
 
         self.post(post_text)
 
-    def who_is(self):
+    def is_who(self):
+        """
+        Response for asking ripbot who.
+        """
         member = Group.list().filter(group_id=group_id)[0].members()
-        intro = ['Signs Point to ', 'Looks like ', 'Winner is ', 'I think it was ']
+
+        intro = ['Signs Point to ',
+                 'Looks like ',
+                 'Winner is ',
+                 'I think it was ']
 
         post_text = random.choice(intro) + random.choice(member).nickname
+
         self.post(post_text)
 
-    def why(self):
+    def is_why(self):
+        """
+        Response for asking ripbot why.
+        """
+
         reasons = [
             'Because he met the Iron Man out of costume.',
             'Because his dinner isn\'t ready',
@@ -544,8 +566,6 @@ class RipDB(object):
         """
         if id is not None:
             try:
-                # member = Group.list().filter(name=which_group)[0].members().filter(
-                #     nickname=id)[0]
                 member = Group.list().filter(group_id=group_id)[0].members().filter(
                     nickname=id)[0]
                 id = int(member.user_id)
