@@ -136,6 +136,7 @@ class GroupMeBot(object):
             member = Group.list().filter(
                 group_id=group_id)[0].members().filter(nickname=points_to)[0]
             points_to = int(member.user_id)
+            log.info('GROUPY: Converted name to ID')
 
         except(TypeError, IndexError):
             pass
