@@ -133,9 +133,9 @@ class GroupMeBot(object):
 
         # see if points_to is a person, get groupme ID if so
         try:
-            id = Group.list().filter(group_id=group_id)[0].members().filter(
-                nickname=id)[0]
-            points_to = int(id)
+            member = Group.list().filter(
+                group_id=group_id)[0].members().filter(nickname=id)[0]
+            points_to = int(member.user_id)
 
         except(TypeError, IndexError):
             pass
