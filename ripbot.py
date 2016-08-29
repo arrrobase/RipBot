@@ -92,7 +92,7 @@ class GroupMeBot(object):
                 top_scores = re.match('^(?:@)?(?:ripbot )?topscores$',
                                       text, re.IGNORECASE)
 
-                bottom_scores = re.match('^(?:@)?(?:ripbot )?bottomscores',
+                bottom_scores = re.match('^(?:@)?(?:ripbot )?bottomscores$',
                                          text, re.IGNORECASE)
 
                 who = re.match('^(?:@)?(?:ripbot )who', text, re.IGNORECASE)
