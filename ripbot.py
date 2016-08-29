@@ -90,7 +90,7 @@ class GroupMeBot(object):
                 gifme = re.match('^(?:@)?(?:ripbot)?(?: )?gifme (.*)', text,
                                  re.IGNORECASE)
 
-                imageme = re.match('^(?:@)?(?:ripbot)?(?: )?imageme (.*)', text,
+                imageme = re.match('^(?:@)?(?:ripbot)?(?: )?image(?: )?me (.*)', text,
                                   re.IGNORECASE)
 
                 top_scores = re.match('^(?:@)?(?:ripbot )?topscores$',
@@ -108,6 +108,9 @@ class GroupMeBot(object):
 
                 if gifme is not None:
                     self.is_gifme(gifme, text)
+
+                if imageme is not None:
+                    self.is_imageme(imageme, text)
 
                 if top_scores is not None:
                     self.is_scores(text)
@@ -216,7 +219,7 @@ class GroupMeBot(object):
                     'searchType': 'image',
                     'safe': 'off',
                     'fields': 'items(link)',
-                    'cx': os.environ['CUSTOM_SEARCH_ID']
+                    'cx': os.environ['CUSTOM_SEARCH_ID'],
                     'key': os.environ['CUSTOM_SEARCH_KEY']
                 }
 
