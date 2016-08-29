@@ -135,11 +135,12 @@ class GroupMeBot(object):
         try:
             member = Group.list().filter(
                 group_id=group_id)[0].members().filter(nickname=points_to)[0]
+
             points_to = int(member.user_id)
             log.info('GROUPY: Converted name to ID')
 
-        except(TypeError, IndexError):
-            pass
+        except(TypeError, IndexError) as e:
+            log.error(e)
 
         what_for = match.group(3).lstrip().rstrip()
         what_for = re.sub(r"^(for|because)", '', what_for).lstrip()
