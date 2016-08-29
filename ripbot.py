@@ -109,6 +109,9 @@ class GroupMeBot(object):
                 if gifme is not None:
                     self.is_gifme(gifme, text)
 
+                if imageme is not None:
+                    self.is_imageme(gifme, text)
+
                 if top_scores is not None:
                     self.is_scores(text)
 
