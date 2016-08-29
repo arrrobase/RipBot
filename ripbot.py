@@ -12,6 +12,7 @@ from flask import Flask, request
 from safygiphy import Giphy
 import logging
 import signal
+import requests
 
 from random import randint
 import urllib.parse as urlparse
@@ -89,8 +90,8 @@ class GroupMeBot(object):
                 gifme = re.match('^(?:@)?(?:ripbot)?(?: )?gifme (.*)', text,
                                  re.IGNORECASE)
 
-                # imageme = re.match('^(?:@)?(?:ripbot)?(?: )?imageme (.*)', text,
-                #                  re.IGNORECASE)
+                imageme = re.match('^(?:@)?(?:ripbot)?(?: )?imageme (.*)', text,
+                                  re.IGNORECASE)
 
                 top_scores = re.match('^(?:@)?(?:ripbot )?topscores$',
                                       text, re.IGNORECASE)
@@ -188,7 +189,7 @@ class GroupMeBot(object):
 
                 try:
                     sorry = gif(tag='sorry')['data']['image_url']
-                    
+
                 except:
                     pass
 
@@ -210,7 +211,16 @@ class GroupMeBot(object):
             log.info('MATCH: imageme in {}.'.format(text))
 
             try:
-                # post_text = STUFF GOES HERE
+                query = {
+                    'q': query,
+                    'searchType': 'image',
+                    'safe': 'off',
+                    'fields': 'items(link)',
+                    'cx': os.environ['CUSTOM_SEARCH_ID']
+                    'key': os.environ['CUSTOM_SEARCH_KEY']
+                }
+
+                post_text = requests.get('https://www.googleapis.com/customsearch/v1', params=query)
                 pass
 
             except (TypeError, IndexError):
