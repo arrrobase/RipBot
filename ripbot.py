@@ -498,8 +498,8 @@ class RipDB(object):
             id = int(member.user_id)
             log.info('GROUPY: Converted name to ID')
 
-        except(TypeError, IndexError) as e:
-            log.error('{} for name "{}.'.format(e, id))
+        except(TypeError, IndexError):
+            pass
 
         if type(id) == int:
             sql = "UPDATE rip_users SET points = points + 1 WHERE id={}"
@@ -539,8 +539,8 @@ class RipDB(object):
             id = int(member.user_id)
             log.info('GROUPY: Converted name to ID')
 
-        except(TypeError, IndexError) as e:
-            log.error('{} for name "{}.'.format(e, id))
+        except(TypeError, IndexError):
+            pass
 
         if type(id) == int:
             sql = "UPDATE rip_users SET points = points - 1 WHERE id={}"
