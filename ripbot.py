@@ -146,7 +146,7 @@ class GroupMeBot(object):
         what_for = re.sub(r"^(for|because)", '', what_for).lstrip()
         what_for = what_for.rstrip('.!?')
 
-        if len(points_to) > 0 or type(points_to) is int:
+        if  type(points_to) == int or len(points_to) > 0:
             log.info('MATCH: plusminus to {} in "{}".'.format(points_to,
                                                               text))
 
