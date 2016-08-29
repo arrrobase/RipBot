@@ -719,6 +719,7 @@ if __name__ == '__main__':
     is_test = os.environ.get('IS_TEST', False)
 
     # which bot to use
+    # TODO: change which and group_id to environment variables
     if is_test:
         which_bot = 'test-ripbot'
         group_id = '23373961'
