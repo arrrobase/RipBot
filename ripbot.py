@@ -89,6 +89,9 @@ class GroupMeBot(object):
                 gifme = re.match('^(?:@)?(?:ripbot)?(?: )?gifme (.*)', text,
                                  re.IGNORECASE)
 
+                # imageme = re.match('^(?:@)?(?:ripbot)?(?: )?imageme (.*)', text,
+                #                  re.IGNORECASE)
+
                 top_scores = re.match('^(?:@)?(?:ripbot )?topscores$',
                                       text, re.IGNORECASE)
 
@@ -190,6 +193,37 @@ class GroupMeBot(object):
                     pass
 
             self.post(post_text)
+
+            if sorry is not None:
+                self.post(sorry)
+
+    def is_imageme(self, match, text):
+        """
+        Response for querying an image. Uses google custom search.
+        :param match: re match groups
+        :param text: message text
+        """
+        query = match.group(1).rstrip()
+        sorry = None
+
+        if len(query) > 0:
+            log.info('MATCH: imageme in {}.'.format(text))
+
+            try:
+                # post_text = STUFF GOES HERE
+                pass
+
+            except (TypeError, IndexError):
+                post_text = 'Sorry, no images matching those tags.'
+
+                try:
+                    sorry = gif(tag='sorry')['data']['image_url']
+
+                except:
+                    pass
+
+            self.post(post_text)
+
             if sorry is not None:
                 self.post(sorry)
 
