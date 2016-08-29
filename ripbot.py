@@ -223,7 +223,8 @@ class GroupMeBot(object):
                     'key': os.environ['CUSTOM_SEARCH_KEY']
                 }
 
-                post_text = requests.get('https://www.googleapis.com/customsearch/v1', params=query)
+                r = requests.get('https://www.googleapis.com/customsearch/v1', params=query)
+                post_text = random.choice(r.json()['items'])['link']
 
             except (TypeError, IndexError):
                 post_text = 'Sorry, no images matching those tags.'
