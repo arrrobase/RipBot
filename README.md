@@ -1,4 +1,4 @@
-## Ripbot GroupMe bot
+## RipBot GroupMe bot
 
 ### What is it?
 
@@ -7,4 +7,4 @@ fun responses. Can request images or gifs.
 
 ### Licensing
 
-Stimulus Program is licensed under GNU GPL v3.0.
+RipBot is licensed under GNU GPL v3.0.
