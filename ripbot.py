@@ -140,7 +140,7 @@ class GroupMeBot(object):
             log.info('GROUPY: Converted name to ID')
 
         except(TypeError, IndexError) as e:
-            log.error(e)
+            log.error('{} for name "{}.'.format(e, points_to))
 
         what_for = match.group(3).lstrip().rstrip()
         what_for = re.sub(r"^(for|because)", '', what_for).lstrip()
