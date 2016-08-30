@@ -798,6 +798,7 @@ class RipbotServer(object):
 if __name__ == '__main__':
     # get groupme API key
     groupy_key = os.environ.get('GROUPY_KEY', None)
+    config.API_KEY = groupy_key
 
     is_test = os.environ.get('IS_TEST', False)
 
