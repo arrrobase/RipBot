@@ -224,7 +224,7 @@ class GroupMeBot(object):
                     'searchType': 'image',
                     'safe': 'off',
                     'fields': 'items(link)',
-                    'imgSize': 'large','
+                    'imgSize': 'large',
                     'cx': os.environ['CUSTOM_SEARCH_ID'],
                     'key': os.environ['CUSTOM_SEARCH_KEY']
                 }
