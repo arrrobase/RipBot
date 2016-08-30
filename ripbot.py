@@ -91,7 +91,9 @@ class GroupMeBot(object):
                                  re.IGNORECASE)
 
                 imageme = re.match('^(?:@)?(?:ripbot)?(?: )?image(?: )?me (.*)', text,
-                                  re.IGNORECASE)
+                                   re.IGNORECASE)
+                animateme = re.match('^(?:@)?(?:ripbot)?(?: )?animate(?: )?me (.*)', text,
+                                   re.IGNORECASE)
 
                 top_scores = re.match('^(?:@)?(?:ripbot )?topscores$',
                                       text, re.IGNORECASE)
@@ -111,6 +113,9 @@ class GroupMeBot(object):
 
                 if imageme is not None:
                     self.is_imageme(imageme, text)
+
+                if animateme is not None:
+                    self.is_imageme(animateme, text, True)
 
                 if top_scores is not None:
                     self.is_scores(text)
@@ -201,7 +206,7 @@ class GroupMeBot(object):
             if sorry is not None:
                 self.post(sorry)
 
-    def is_imageme(self, match, text):
+    def is_imageme(self, match, text, animated=False):
         """
         Response for querying an image. Uses google custom search.
         :param match: re match groups
@@ -219,8 +224,15 @@ class GroupMeBot(object):
                     'searchType': 'image',
                     'safe': 'off',
                     'fields': 'items(link)',
+                    'imgSize': 'large','
                     'cx': os.environ['CUSTOM_SEARCH_ID'],
                     'key': os.environ['CUSTOM_SEARCH_KEY']
+                }
+
+                if (animated) {
+                    query['fileType'] = 'gif'
+                    query['hq'] = 'animated'
+                    query['tbs'] = 'itp:animated'
                 }
 
                 r = requests.get('https://www.googleapis.com/customsearch/v1', params=query)
