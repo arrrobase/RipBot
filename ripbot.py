@@ -783,7 +783,7 @@ class RipbotServer(object):
         """
         # send callbacks to ripbot
         port = int(os.environ.get('PORT', 5000))
-        self.app.route('/groupme', methods=['POST'])(ripbot.callback)
+        self.app.route('/groupme', methods=['POST'])(bot.callback)
         self.app.run('0.0.0.0', port=port)
 
     def shutdown(self, signun, frame):
