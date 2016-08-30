@@ -170,7 +170,7 @@ class GroupMeBot(object):
         Posts to proper group.
 
         :param group_id: group to post to
-        :param post: string of post, or iterable of posts
+        :param to_post: string of post, or iterable of posts
         """
         post = self.bots[group_id]['post']
 
@@ -202,15 +202,15 @@ class GroupMeBot(object):
 
             if plus_or_minus == '++':
                 if points_to.lower() == 'chipotle':
-                    points = rip_db.sub_point(points_to)
+                    points = rip_db.sub_point(points_to, group_id)
                 else:
-                    points = rip_db.add_point(points_to)
+                    points = rip_db.add_point(points_to, group_id)
 
             elif plus_or_minus == '--':
                 if points_to.lower() == 'baja fresh':
-                    points = rip_db.add_point(points_to)
+                    points = rip_db.add_point(points_to, group_id)
                 else:
-                    points = rip_db.sub_point(points_to)
+                    points = rip_db.sub_point(points_to, group_id)
 
             post_text = '{} now has {} point'
 
@@ -349,10 +349,10 @@ class GroupMeBot(object):
         log.info('MATCH: topscores in "{}".'.format(text))
 
         if top:
-            top_scores = rip_db.get_scores()
+            top_scores = rip_db.get_scores(group_id)
             post_text = '>Top 10 scores:\n'
         else:
-            top_scores = rip_db.get_scores(False)
+            top_scores = rip_db.get_scores(group_id, False)
             post_text = '>Bottom 10 scores:\n'
 
         for i, score in enumerate(top_scores):
@@ -418,10 +418,10 @@ class GroupMeBot(object):
         user_id = int(member.user_id)
 
         # check if user already in DB
-        if not rip_db.exists(user_id):
-            rip_db.add_player(user_id, user_name)
+        if not rip_db.exists(user_id, group_id):
+            rip_db.add_player(user_id, user_name, group_id)
 
-        points = rip_db.get_player_points(user_id)
+        points = rip_db.get_player_points(user_id, group_id)
         post_text = 'Welcome {}. You have {} points.'.format(user_name, points)
 
         return post_text
@@ -441,7 +441,7 @@ class GroupMeBot(object):
             user_id = int(member.user_id)
 
             # check if user already in DB
-            if not rip_db.exists(user_id):
+            if not rip_db.exists(user_id, group_id):
                 log.warning('DB: user not found in DB but should have been. '
                             'Probably does not have any points yet.')
                 return
@@ -449,9 +449,9 @@ class GroupMeBot(object):
         except IndexError:  # fallback to switching by name rather than user_id
             user_id = user_name
 
-        rip_db.change_player_name(new_name, user_id)
+        rip_db.change_player_name(new_name, user_id, group_id)
 
-        points = rip_db.get_player_points(user_id)
+        points = rip_db.get_player_points(user_id, group_id)
         post_text = 'Don\'t worry {}, you still have your {} point(s).'.format(
             new_name, points)
 
@@ -519,7 +519,7 @@ class RipDB(object):
         try:
             if self.con is not None:
                 self.cur.execute(sql)
-                log.info('DB: rip_users table created')
+                log.info('DB: {} table created'.format(group_id))
                 self.con.commit()
 
         except psycopg2.DatabaseError as e:
