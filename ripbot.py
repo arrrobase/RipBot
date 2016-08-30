@@ -229,11 +229,10 @@ class GroupMeBot(object):
                     'key': os.environ['CUSTOM_SEARCH_KEY']
                 }
 
-                if (animated) {
+                if animated:
                     query['fileType'] = 'gif'
                     query['hq'] = 'animated'
                     query['tbs'] = 'itp:animated'
-                }
 
                 r = requests.get('https://www.googleapis.com/customsearch/v1', params=query)
                 post_text = random.choice(r.json()['items'])['link']
