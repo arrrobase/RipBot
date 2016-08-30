@@ -70,6 +70,7 @@ class GroupMeBot(object):
                 bot_name = self.bots[group_id]['name']
             except KeyError:
                 log.info('Missing group; restarting')
+                # just make the app crash, screw it
                 sys.exit(0)
 
         else:
