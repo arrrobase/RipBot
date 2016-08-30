@@ -64,7 +64,7 @@ class GroupMeBot(object):
             system = data['system']
 
         if 'group_id' in data:
-            group_id = data['group_id']
+            group_id = int(data['group_id'])
 
         else:
             log.error('No group_id. Unknown originating group.')
