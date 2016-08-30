@@ -280,7 +280,7 @@ class GroupMeBot(object):
 
                 r = requests.get('https://www.googleapis.com/youtube/v3/search', params=query)
                 videoId = r.json()['items'][0]['id']['videoId']
-                post_text = 'https://www.youtube.com/watch?v={}.'.format(videoId)
+                post_text = 'https://www.youtube.com/watch?v={}'.format(videoId)
 
             except (TypeError, IndexError):
                 post_text = 'Sorry, no videos that search matching those tags.'
