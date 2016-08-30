@@ -273,13 +273,13 @@ class GroupMeBot(object):
                 query = {
                     'q': query,
                     'part': 'snippet',
-                    'fields': 'items(id)',
+                    'fields': 'items(id(videoId))',
                     'safeSearch': 'none',
                     'key': os.environ['CUSTOM_SEARCH_KEY']
                 }
 
                 r = requests.get('https://www.googleapis.com/youtube/v3/search', params=query)
-                videoId = random.choice(r.json()['items'])['id']['videoId']
+                videoId = r.json()['items'][0]['id']['videoId']
                 post_text = 'https://www.youtube.com/watch?v={}.'.format(videoId)
 
             except (TypeError, IndexError):
