@@ -121,7 +121,7 @@ class GroupMeBot(object):
                     self.is_imageme(animateme, text, True)
 
                 if youtube is not None:
-                    self.is_youtube(animateme, text)
+                    self.is_youtube(youtube, text)
 
                 if top_scores is not None:
                     self.is_scores(text)
