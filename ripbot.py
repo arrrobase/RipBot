@@ -841,7 +841,7 @@ def start():
     bot = GroupMeBot(bots)
 
     # initialize database class
-    global rip_dib
+    global rip_db
     rip_db = RipDB(group_ids)
 
     # initialize giphy
