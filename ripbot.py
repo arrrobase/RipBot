@@ -162,11 +162,11 @@ class GroupMeBot(object):
         post = self.bots[group_id]
 
         try:
+            post(to_post)
+
+        except (TypeError, AttributeError):
             for message in to_post:
                 post(message)
-
-        except TypeError:
-            post(to_post)
 
     def is_plusminus(self, match, text):
         """
