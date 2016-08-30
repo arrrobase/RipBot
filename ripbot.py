@@ -572,7 +572,7 @@ class RipDB(object):
                              format(id, points))
                 else:
                     points = 0
-                    id_num = self.new_id(id)
+                    id_num = self.new_id(id, group_id)
                     self.add_player(id_num, str(id), group_id, points)
 
                 return points
