@@ -28,8 +28,8 @@ class GroupMeBot(object):
     """
     Simple Groupme bot
     """
-    def __init__(self, post):
-        self.post = post
+    def __init__(self, bots):
+        self.bots = bots
         log.info('Ripbot up and running.')
 
     def callback(self):
@@ -52,6 +52,7 @@ class GroupMeBot(object):
         name = None
         text = None
         system = None
+        group_id = None
 
         if 'name' in data:
             name = data['name']
@@ -61,6 +62,13 @@ class GroupMeBot(object):
 
         if 'system' in data:
             system = data['system']
+
+        if 'group_id' in data:
+            group_id = data['group_id']
+
+        else:
+            log.error('No group_id. Unknown originating group.')
+            return
 
         # check if system message
         if system:
@@ -84,14 +92,17 @@ class GroupMeBot(object):
             log.info('BOT: Got user message, parsing...')
 
             if text is not None:
+                post = None
+
                 # matches string in format: '@First Last ++ more text'
                 plus_minus = re.match('^(.*?)(\+\+|\-\-)(.*)', text)
 
-                gifme = re.match('^(?:@)?(?:ripbot)?(?: )?gifme (.*)', text,
+                gifme = re.match('^(?:@)?(?:ripbot)?(?: )?gif(?: )?(?:me)? (.*)', text,
                                  re.IGNORECASE)
 
                 imageme = re.match('^(?:@)?(?:ripbot)?(?: )?image(?: )?(?:me)? (.*)', text,
                                    re.IGNORECASE)
+
                 animateme = re.match('^(?:@)?(?:ripbot)?(?: )?animate(?: )?(?:me)? (.*)', text,
                                    re.IGNORECASE)
 
@@ -109,34 +120,53 @@ class GroupMeBot(object):
                 why = re.match('^(?:@)?(?:ripbot )why', text, re.IGNORECASE)
 
                 if plus_minus is not None:
-                    self.is_plusminus(plus_minus, text)
+                    post = self.is_plusminus(plus_minus, text)
 
                 if gifme is not None:
-                    self.is_gifme(gifme, text)
+                    post = self.is_gifme(gifme, text)
 
                 if imageme is not None:
-                    self.is_imageme(imageme, text)
+                    post = self.is_imageme(imageme, text)
 
                 if animateme is not None:
-                    self.is_imageme(animateme, text, True)
+                    post = self.is_imageme(animateme, text, True)
 
                 if youtube is not None:
-                    self.is_youtube(youtube, text)
+                    post = self.is_youtube(youtube, text)
 
                 if top_scores is not None:
-                    self.is_scores(text)
+                    post = self.is_scores(text)
 
                 if bottom_scores is not None:
-                    self.is_scores(text, False)
+                    post = self.is_scores(text, False)
 
                 if who is not None:
-                    self.is_who()
+                    post = self.is_who()
 
                 if why is not None:
-                    self.is_why()
+                    post = self.is_why()
 
                 else:
                     log.info('No matches; ignoring.')
+
+                if post is not None:
+                    self.post(group_id, post)
+
+    def post(self, group_id, to_post):
+        """
+        Posts to proper group.
+
+        :param group_id: group to post to
+        :param post: string of post, or iterable of posts
+        """
+        post = self.bots[group_id]
+
+        try:
+            for message in to_post:
+                post(message)
+
+        except TypeError:
+            post(to_post)
 
     def is_plusminus(self, match, text):
         """
@@ -153,7 +183,7 @@ class GroupMeBot(object):
         what_for = re.sub(r"^(for|because)", '', what_for).lstrip()
         what_for = what_for.rstrip('.!?')
 
-        if  type(points_to) == int or len(points_to) > 0:
+        if type(points_to) == int or len(points_to) > 0:
             log.info('MATCH: plusminus to {} in "{}".'.format(points_to,
                                                               text))
 
@@ -181,7 +211,7 @@ class GroupMeBot(object):
                 post_text += '.'
                 post_text = post_text.format(points_to, points)
 
-            self.post(post_text)
+            return post_text
 
     def is_gifme(self, match, text):
         """
@@ -207,10 +237,10 @@ class GroupMeBot(object):
                 except:
                     pass
 
-            self.post(post_text)
-
             if sorry is not None:
-                self.post(sorry)
+                post_text = [post_text, sorry]
+
+            return post_text
 
     def is_imageme(self, match, text, animated=False):
         """
@@ -243,7 +273,7 @@ class GroupMeBot(object):
                 r = requests.get('https://www.googleapis.com/customsearch/v1', params=query)
                 post_text = random.choice(r.json()['items'])['link']
 
-            except (TypeError, IndexError):
+            except:
                 post_text = 'Sorry, no images matching those tags.'
 
                 try:
@@ -252,10 +282,10 @@ class GroupMeBot(object):
                 except:
                     pass
 
-            self.post(post_text)
-
             if sorry is not None:
-                self.post(sorry)
+                post_text = [post_text, sorry]
+
+            return post_text
 
     def is_youtube(self, match, text):
         """
@@ -291,10 +321,10 @@ class GroupMeBot(object):
                 except:
                     pass
 
-            self.post(post_text)
-
             if sorry is not None:
-                self.post(sorry)
+                post_text = [post_text, sorry]
+
+            return post_text
 
     def is_scores(self, text, top=True):
         """
@@ -306,10 +336,10 @@ class GroupMeBot(object):
         log.info('MATCH: topscores in "{}".'.format(text))
 
         if top:
-            top_scores = rip_db.get_top_scores()
+            top_scores = rip_db.get_scores()
             post_text = '>Top 10 scores:\n'
         else:
-            top_scores = rip_db.get_top_scores(False)
+            top_scores = rip_db.get_scores(False)
             post_text = '>Bottom 10 scores:\n'
 
         for i, score in enumerate(top_scores):
@@ -327,7 +357,7 @@ class GroupMeBot(object):
             if top_scores[i][1] != 1:
                 post_text += 's'
 
-        self.post(post_text)
+        return post_text
 
     def is_who(self):
         """
@@ -342,7 +372,7 @@ class GroupMeBot(object):
 
         post_text = random.choice(intro) + random.choice(member).nickname
 
-        self.post(post_text)
+        return post_text
 
     def is_why(self):
         """
@@ -358,7 +388,9 @@ class GroupMeBot(object):
             'Because @AT made him do it'
         ]
 
-        self.post(random.choice(reasons))
+        post_text = random.choice(reasons)
+
+        return post_text
 
     def is_new_user(self, match):
         """
@@ -368,8 +400,6 @@ class GroupMeBot(object):
         user_name = match.group(2)
         log.info('SYSTEM MATCH: new user detected.')
 
-        # member = Group.list().filter(name=which_group)[0].members().filter(
-        #     nickname=user_name)[0]
         member = Group.list().filter(group_id=group_id)[0].members().filter(
             nickname=user_name)[0]
         user_id = int(member.user_id)
@@ -381,7 +411,7 @@ class GroupMeBot(object):
         points = rip_db.get_player_points(user_id)
         post_text = 'Welcome {}. You have {} points.'.format(user_name, points)
 
-        self.post(post_text)
+        return post_text
 
     def is_name_change(self, match):
         """
@@ -393,8 +423,6 @@ class GroupMeBot(object):
         log.info('SYSTEM MATCH: nickname change detected.')
 
         try:
-            # member = Group.list().filter(name=which_group)[0].members().filter(
-            #     nickname=new_name)[0]
             member = Group.list().filter(group_id=group_id)[0].members().filter(
                 nickname=new_name)[0]
             user_id = int(member.user_id)
@@ -414,7 +442,7 @@ class GroupMeBot(object):
         post_text = 'Don\'t worry {}, you still have your {} point(s).'.format(
             new_name, points)
 
-        self.post(post_text)
+        return post_text
 
 
 class RipDB(object):
@@ -622,7 +650,7 @@ class RipDB(object):
         else:
             log.error('Failed adding points: not connected to DB.')
 
-    def get_top_scores(self, top=True):
+    def get_scores(self, top=True):
         """
         Gets top 10 scorers
         :return:
@@ -761,8 +789,8 @@ class RipbotServer(object):
     def shutdown(self, signun, frame):
         """
         Gracefully shuts down flask server and ripbot.
-        :param signum:
-        :param frame:
+        :param signum: param from signal callback
+        :param frame: param from signal callback
         """
         self.log.info('SIGTERM: shutting down')
         sys.exit(0)
@@ -770,7 +798,6 @@ class RipbotServer(object):
 if __name__ == '__main__':
     # get groupme API key
     groupy_key = os.environ.get('GROUPY_KEY', None)
-    config.API_KEY = groupy_key
 
     is_test = os.environ.get('IS_TEST', False)
 
@@ -784,14 +811,19 @@ if __name__ == '__main__':
         which_bot = 'ripbot'
         group_id = '13678029'
 
-    bot = Bot.list().filter(name=which_bot)[0]
+    # bot = Bot.list().filter(name=which_bot)[0]
+
+    bots = [int(i.group_id) for i in Bot.list()]
+    posts = [i.post for i in Bot.list()]
+    bots = dict(zip(bots, posts))
 
     # start server
     server = RipbotServer()
     log = server.log
 
     # initialize bot
-    ripbot = GroupMeBot(bot.post)
+    # ripbot = GroupMeBot(bot.post)
+    bot = GroupMeBot(bots)
 
     # initialize database class
     rip_db = RipDB()
