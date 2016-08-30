@@ -81,16 +81,16 @@ class GroupMeBot(object):
                 name_change = re.match('(.*) changed name to (.*)', text)
 
                 if new_user is not None:
-                    self.is_new_user(new_user)
+                    self.is_new_user(new_user, group_id)
 
                 elif name_change is not None:
-                    self.is_name_change(name_change)
+                    self.is_name_change(name_change, group_id)
 
                 else:
                     log.info('No matches; ignoring.')
 
         # non system messages not originating from ripbot
-        elif name is not None and name != which_bot:
+        elif name is not None and name != bot_name:
             log.info('BOT: Got user message, parsing...')
 
             if text is not None:
@@ -133,7 +133,7 @@ class GroupMeBot(object):
                     text, re.IGNORECASE)
 
                 if plus_minus is not None:
-                    post = self.is_plusminus(plus_minus, text)
+                    post = self.is_plusminus(plus_minus, text, group_id)
 
                 if gifme is not None:
                     post = self.is_gifme(gifme, text)
@@ -148,13 +148,13 @@ class GroupMeBot(object):
                     post = self.is_youtube(youtube, text)
 
                 if top_scores is not None:
-                    post = self.is_scores(text)
+                    post = self.is_scores(text, group_id)
 
                 if bottom_scores is not None:
-                    post = self.is_scores(text, False)
+                    post = self.is_scores(text, group_id, False)
 
                 if who is not None:
-                    post = self.is_who()
+                    post = self.is_who(group_id)
 
                 if why is not None:
                     post = self.is_why()
@@ -181,7 +181,7 @@ class GroupMeBot(object):
             for message in to_post:
                 post(message)
 
-    def is_plusminus(self, match, text):
+    def is_plusminus(self, match, text, group_id):
         """
         Response for adding/subtracting points
         :param match: re match groups
@@ -339,7 +339,7 @@ class GroupMeBot(object):
 
             return post_text
 
-    def is_scores(self, text, top=True):
+    def is_scores(self, text, group_id, top=True):
         """
         Response for querying top or bottom scorers.
 
@@ -372,7 +372,7 @@ class GroupMeBot(object):
 
         return post_text
 
-    def is_who(self):
+    def is_who(self, group_id):
         """
         Response for asking ripbot who.
         """
@@ -405,7 +405,7 @@ class GroupMeBot(object):
 
         return post_text
 
-    def is_new_user(self, match):
+    def is_new_user(self, match, group_id):
         """
         Response to new user. Welcomes them and adds them to db.
         :param match: re match groups
@@ -426,7 +426,7 @@ class GroupMeBot(object):
 
         return post_text
 
-    def is_name_change(self, match):
+    def is_name_change(self, match, group_id):
         """
         Changed name in DB on nickname change.
         :param match: re match groups
@@ -462,7 +462,7 @@ class RipDB(object):
     """
     Database holding player scores and ids
     """
-    def __init__(self):
+    def __init__(self, group_ids):
         """
         Connect to db and setup cursor.
         """
@@ -486,33 +486,35 @@ class RipDB(object):
             # set up cursor for actions
             self.cur = self.con.cursor()
 
-            # check if rip_users table exists, if not create
-            sql = "SELECT EXISTS(SELECT 1 FROM information_schema.tables " \
-                  "WHERE table_name='{}')".format('rip_users')
+            # check if tables exist, if not create
+            for group_id in group_ids:
+                sql = "SELECT EXISTS(SELECT 1 FROM information_schema.tables " \
+                      "WHERE table_name='{}')".format('rip_users')
 
-            self.cur.execute(sql)
-            table_exists = self.cur.fetchone()[0]
+                self.cur.execute(sql)
+                table_exists = self.cur.fetchone()[0]
 
-            if not table_exists:
-                log.warning('DB: table not found, creating...')
-                self.set_up_table()
+                if not table_exists:
+                    log.warning('DB: {} table not found, creating...'.format(
+                        str(group_id)))
+                    self.set_up_table(group_id)
 
         except psycopg2.DatabaseError as e:
             if self.con:
                 self.con.rollback()
             log.error(e)
 
-    def set_up_table(self):
+    def set_up_table(self, group_id):
         """
         Sets up postgres table if none found.
 
         :return:
         """
-        sql = "CREATE TABLE rip_users (" \
+        sql = "CREATE TABLE \"{}\" (" \
               "id INT PRIMARY KEY," \
               "name TEXT,"\
               "points INT"\
-              ")"
+              ")".format(group_id)
 
         try:
             if self.con is not None:
@@ -525,18 +527,18 @@ class RipDB(object):
                 self.con.rollback()
             log.error(e)
 
-    def add_player(self, id, name, points=0):
+    def add_player(self, id, name, group_id, points=0):
         """
         Adds new player to table.
         :param id: member id number
         :param name: groupme nickname
         :param points: points to start with
         """
-        sql = "INSERT INTO rip_users VALUES({}, '{}', {})"
+        sql = "INSERT INTO \"{}\" VALUES({}, '{}', {})"
 
         if self.con is not None:
             try:
-                self.cur.execute(sql.format(id, name, points))
+                self.cur.execute(sql.format(group_id, id, name, points))
                 self.con.commit()
                 log.info('DB: Added {} to table with id# {} and {} point('
                          's).'.format(name, id, points))
@@ -547,21 +549,21 @@ class RipDB(object):
         else:
             log.error('Failed adding player: not connected to DB.')
 
-    def get_player_points(self, id):
+    def get_player_points(self, id, group_id):
         """
         Gets player points by name or id.
         :param id: player name or id
         :return: players points as int
         """
         if type(id) == int:
-            sql = "SELECT points FROM rip_users WHERE id={}"
+            sql = "SELECT points FROM \"{}\" WHERE id={}"
 
         else:
-            sql = "SELECT points FROM rip_users WHERE LOWER(name)=LOWER('{}')"
+            sql = "SELECT points FROM \"{}\" WHERE LOWER(name)=LOWER('{}')"
 
         if self.con is not None:
             try:
-                self.cur.execute(sql.format(id))
+                self.cur.execute(sql.format(group_id, id))
                 points = self.cur.fetchone()
 
                 if points is not None:
@@ -571,7 +573,7 @@ class RipDB(object):
                 else:
                     points = 0
                     id_num = self.new_id(id)
-                    self.add_player(id_num, str(id), points)
+                    self.add_player(id_num, str(id), group_id, points)
 
                 return points
 
@@ -581,7 +583,7 @@ class RipDB(object):
         else:
             log.error('Failed retrieving player points: not connected to DB.')
 
-    def add_point(self, id):
+    def add_point(self, id, group_id):
         """
         Adds point to player by name or id.
         :param id: player name or id
@@ -599,17 +601,17 @@ class RipDB(object):
             pass
 
         if type(id) == int:
-            sql = "UPDATE rip_users SET points = points + 1 WHERE id={}"
+            sql = "UPDATE \"{}\" SET points = points + 1 WHERE id={}"
 
         else:
-            sql = "UPDATE rip_users SET points = points + 1 WHERE " \
+            sql = "UPDATE \"{}\" SET points = points + 1 WHERE " \
                   "LOWER(name)=LOWER('{}')"
 
         if self.con is not None:
             try:
                 # get points first because this checks if exists or not
-                cur_points = self.get_player_points(id)
-                self.cur.execute(sql.format(id))
+                cur_points = self.get_player_points(id, group_id)
+                self.cur.execute(sql.format(group_id, id))
                 self.con.commit()
                 log.info('ADD: point to {}; now has {} point(s).'.format(id,
                                                                          cur_points+1))
@@ -622,7 +624,7 @@ class RipDB(object):
         else:
             log.error('Failed adding points: not connected to DB.')
 
-    def sub_point(self, id):
+    def sub_point(self, id, group_id):
         """
         Adds point to player by name or id.
         :param id: player name or id
@@ -640,17 +642,17 @@ class RipDB(object):
             pass
 
         if type(id) == int:
-            sql = "UPDATE rip_users SET points = points - 1 WHERE id={}"
+            sql = "UPDATE \"{}\" SET points = points - 1 WHERE id={}"
 
         else:
-            sql = "UPDATE rip_users SET points = points - 1 WHERE " \
+            sql = "UPDATE \"{}\" SET points = points - 1 WHERE " \
                   "LOWER(name)=LOWER('{}')"
 
         if self.con is not None:
             try:
                 # get points first because this checks if exists or not
-                cur_points = self.get_player_points(id)
-                self.cur.execute(sql.format(id))
+                cur_points = self.get_player_points(id, group_id)
+                self.cur.execute(sql.format(group_id, id))
                 self.con.commit()
                 log.info('SUB: point to {}; now has {} point(s).'.format(id,
                                                                          cur_points-1))
@@ -663,21 +665,21 @@ class RipDB(object):
         else:
             log.error('Failed adding points: not connected to DB.')
 
-    def get_scores(self, top=True):
+    def get_scores(self, group_id, top=True):
         """
         Gets top 10 scorers
         :return:
         """
         if top:
-            sql = 'SELECT name, points FROM rip_users ORDER BY points DESC LIMIT 10'
+            sql = 'SELECT name, points FROM \"{}\" ORDER BY points DESC LIMIT 10'
         else:
-            sql = 'SELECT name, points FROM rip_users ORDER BY points ASC LIMIT 10'
+            sql = 'SELECT name, points FROM \"{}\" ORDER BY points ASC LIMIT 10'
 
         log.info('DB: getting top/bottom scorers.')
 
         if self.con is not None:
             try:
-                self.cur.execute(sql)
+                self.cur.execute(sql.format(group_id))
                 top_scores = self.cur.fetchall()
 
                 return top_scores
@@ -686,8 +688,7 @@ class RipDB(object):
                 self.con.rollback()
                 log.error(e)
 
-
-    def change_player_name(self, new_name, id):
+    def change_player_name(self, new_name, id, group_id):
         """
         Changes the players name in the db
         :param new_name:
@@ -695,14 +696,14 @@ class RipDB(object):
         :return:
         """
         if type(id) == int:
-            sql = "UPDATE rip_users SET name='{}' WHERE id={}"
+            sql = "UPDATE \"{}\" SET name='{}' WHERE id={}"
 
         else:
-            sql = "UPDATE rip_users SET name='{}' WHERE LOWER(name)=LOWER('{}')"
+            sql = "UPDATE \"{}\" SET name='{}' WHERE LOWER(name)=LOWER('{}')"
 
         if self.con is not None:
             try:
-                self.cur.execute(sql.format(new_name, id))
+                self.cur.execute(sql.format(group_id, new_name, id))
                 self.con.commit()
 
                 log.info('DB: {} name changed to {}'.format(id, new_name))
@@ -714,7 +715,7 @@ class RipDB(object):
         else:
             log.error('Failed changing name: not connected to DB.')
 
-    def new_id(self, id=None):
+    def new_id(self, group_id, id=None):
         """
         Generates new IDs for non players that need points
         :return: new random int
@@ -731,13 +732,13 @@ class RipDB(object):
 
         not_taken = False
 
-        sql = "SELECT * FROM rip_users WHERE id={}"
+        sql = "SELECT * FROM \"{}\" WHERE id={}"
 
         if id is None:
             while not not_taken:
                 try:
                     id = randint(9999999, 100000000)
-                    self.cur.execute(sql.format(id))
+                    self.cur.execute(sql.format(group_id, id))
                     ret = self.cur.fetchone()
                     if ret is None:
                         not_taken = True
@@ -751,17 +752,17 @@ class RipDB(object):
 
         return id
 
-    def exists(self, id):
+    def exists(self, id, group_id):
         """
         Checks if user id already in table.
         :param id: user id #
         :return: boolean
         """
-        sql = 'SELECT * FROM rip_users WHERE id={}'
+        sql = 'SELECT * FROM \"{}\" WHERE id={}'
 
         try:
             # log.info('MESSAGE: ' + repr(id))
-            self.cur.execute(sql.format(id))
+            self.cur.execute(sql.format(group_id, id))
             ret = self.cur.fetchone()
 
             if ret is None:
@@ -817,23 +818,24 @@ if __name__ == '__main__':
 
     # which bot to use
     # TODO: change which and group_id to environment variables
-    if is_test:
-        which_bot = 'test-ripbot'
-        group_id = '23373961'
-
-    else:
-        which_bot = 'ripbot'
-        group_id = '13678029'
-
+    # if is_test:
+    #     which_bot = 'test-ripbot'
+    #     group_id = '23373961'
+    #
+    # else:
+    #     which_bot = 'ripbot'
+    #     group_id = '13678029'
+    #
     # bot = Bot.list().filter(name=which_bot)[0]
 
-    bots = [int(i.group_id) for i in Bot.list()]
+    group_ids = [int(i.group_id) for i in Bot.list()]
     posts = [i.post for i in Bot.list()]
     names = Bot.list()
 
     # nested dict of group_id, with post method and bot name
     # eg: {23373961: {'post': <post method>, 'name': 'ripbot'}
-    bots = dict(zip(bots, [dict(zip(['post', 'name'], i)) for i in zip(posts, names)]))
+    bots = dict(zip(group_ids, [dict(zip(['post', 'name'], i)) for i in zip(
+        posts, names)]))
 
     # start server
     server = RipbotServer()
@@ -844,7 +846,7 @@ if __name__ == '__main__':
     bot = GroupMeBot(bots)
 
     # initialize database class
-    rip_db = RipDB()
+    rip_db = RipDB(group_ids)
 
     # initialize giphy
     giphy = Giphy()
