@@ -105,30 +105,32 @@ class GroupMeBot(object):
                     text, re.IGNORECASE)
 
                 imageme = re.match(
-                    '^(?:@)?(?:ripbot)?(?: )?image(?: )?(?:me)? (.*)', text,
-                                   re.IGNORECASE)
+                    '^(?:@)?(?:{})?(?: )?image(?: )?(?:me)? (.*)'.format(bot_name),
+                    text, re.IGNORECASE)
 
                 animateme = re.match(
-                    '^(?:@)?(?:ripbot)?(?: )?animate(?: )?(?:me)? (.*)', text,
-                                   re.IGNORECASE)
+                    '^(?:@)?(?:{})?(?: )?animate(?: )?(?:me)? (.*)'.format(bot_name),
+                    text, re.IGNORECASE)
 
                 youtube = re.match(
-                    '^(?:@)?(?:ripbot)?(?: )?(?:youtube|yt)(?: )?(?:me)? (.*)', text,
-                                   re.IGNORECASE)
+                    '^(?:@)?(?:{})?(?: )?(?:youtube|yt)(?: )?(?:me)? (.*)'.format(bot_name),
+                    text, re.IGNORECASE)
 
                 top_scores = re.match(
-                    '^(?:@)?(?:ripbot )?topscores$',
-                                      text, re.IGNORECASE)
+                    '^(?:@)?(?:{} )?topscores$'.format(bot_name),
+                    text, re.IGNORECASE)
 
                 bottom_scores = re.match(
-                    '^(?:@)?(?:ripbot )?bottomscores$',
-                                         text, re.IGNORECASE)
+                    '^(?:@)?(?:{} )?bottomscores$'.format(bot_name),
+                    text, re.IGNORECASE)
 
                 who = re.match(
-                    '^(?:@)?(?:ripbot )who', text, re.IGNORECASE)
+                    '^(?:@)?(?:{} )who'.format(bot_name),
+                    text, re.IGNORECASE)
 
                 why = re.match(
-                    '^(?:@)?(?:ripbot )why', text, re.IGNORECASE)
+                    '^(?:@)?(?:{} )why'.format(bot_name),
+                    text, re.IGNORECASE)
 
                 if plus_minus is not None:
                     post = self.is_plusminus(plus_minus, text)
