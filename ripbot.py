@@ -71,6 +71,7 @@ class GroupMeBot(object):
             except KeyError:
                 log.info('Missing group; restarting')
                 start()
+                return
 
         else:
             log.error('No group_id. Unknown originating group.')
@@ -206,15 +207,15 @@ class GroupMeBot(object):
 
             if plus_or_minus == '++':
                 if points_to.lower() == 'chipotle':
-                    points = rip_db.sub_point(points_to, group_id)
+                    points = db.sub_point(points_to, group_id)
                 else:
-                    points = rip_db.add_point(points_to, group_id)
+                    points = db.add_point(points_to, group_id)
 
             elif plus_or_minus == '--':
                 if points_to.lower() == 'baja fresh':
-                    points = rip_db.add_point(points_to, group_id)
+                    points = db.add_point(points_to, group_id)
                 else:
-                    points = rip_db.sub_point(points_to, group_id)
+                    points = db.sub_point(points_to, group_id)
 
             post_text = '{} now has {} point'
 
@@ -353,10 +354,10 @@ class GroupMeBot(object):
         log.info('MATCH: topscores in "{}".'.format(text))
 
         if top:
-            top_scores = rip_db.get_scores(group_id)
+            top_scores = db.get_scores(group_id)
             post_text = '>Top 10 scores:\n'
         else:
-            top_scores = rip_db.get_scores(group_id, False)
+            top_scores = db.get_scores(group_id, False)
             post_text = '>Bottom 10 scores:\n'
 
         for i, score in enumerate(top_scores):
@@ -422,10 +423,10 @@ class GroupMeBot(object):
         user_id = int(member.user_id)
 
         # check if user already in DB
-        if not rip_db.exists(user_id, group_id):
-            rip_db.add_player(user_id, user_name, group_id)
+        if not db.exists(user_id, group_id):
+            db.add_player(user_id, user_name, group_id)
 
-        points = rip_db.get_player_points(user_id, group_id)
+        points = db.get_player_points(user_id, group_id)
         post_text = 'Welcome {}. You have {} points.'.format(user_name, points)
 
         return post_text
@@ -445,7 +446,7 @@ class GroupMeBot(object):
             user_id = int(member.user_id)
 
             # check if user already in DB
-            if not rip_db.exists(user_id, group_id):
+            if not db.exists(user_id, group_id):
                 log.warning('DB: user not found in DB but should have been. '
                             'Probably does not have any points yet.')
                 return
@@ -453,16 +454,16 @@ class GroupMeBot(object):
         except IndexError:  # fallback to switching by name rather than user_id
             user_id = user_name
 
-        rip_db.change_player_name(new_name, user_id, group_id)
+        db.change_player_name(new_name, user_id, group_id)
 
-        points = rip_db.get_player_points(user_id, group_id)
+        points = db.get_player_points(user_id, group_id)
         post_text = 'Don\'t worry {}, you still have your {} point(s).'.format(
             new_name, points)
 
         return post_text
 
 
-class RipDB(object):
+class Database(object):
     """
     Database holding player scores and ids
     """
@@ -818,20 +819,21 @@ def start():
     groupy_key = os.environ.get('GROUPY_KEY', None)
     config.API_KEY = groupy_key
 
-    is_test = os.environ.get('IS_TEST', False)
+    # is_test = os.environ.get('IS_TEST', False)
 
     group_ids = [int(i.group_id) for i in Bot.list()]
     posts = [i.post for i in Bot.list()]
     names = Bot.list()
 
     # nested dict of group_id, with post method and bot name
-    # eg: {23373961: {'post': <post method>, 'name': 'ripbot'}
+    # eg: {23373961: {'post': <post method>, 'name': 'ripbot'}}
     bots = dict(zip(group_ids, [dict(zip(['post', 'name'], i)) for i in zip(
         posts, names)]))
 
     # start server
     server = RipbotServer()
     # GLOBALS ARE BAD
+    # TODO: make a class to handle startup and restarting
     global log
     log = server.log
 
@@ -841,8 +843,8 @@ def start():
     bot = GroupMeBot(bots)
 
     # initialize database class
-    global rip_db
-    rip_db = RipDB(group_ids)
+    global db
+    db = Database(group_ids)
 
     # initialize giphy
     giphy = Giphy()
