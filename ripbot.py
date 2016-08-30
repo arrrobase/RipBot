@@ -489,7 +489,7 @@ class RipDB(object):
             # check if tables exist, if not create
             for group_id in group_ids:
                 sql = "SELECT EXISTS(SELECT 1 FROM information_schema.tables " \
-                      "WHERE table_name='{}')".format('rip_users')
+                      "WHERE table_name='{}')".format(group_id)
 
                 self.cur.execute(sql)
                 table_exists = self.cur.fetchone()[0]
