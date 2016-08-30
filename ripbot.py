@@ -91,7 +91,7 @@ class GroupMeBot(object):
 
         # non system messages not originating from ripbot
         elif name is not None and name != bot_name:
-            log.info('BOT: Got user message, parsing...')
+            log.info('BOT: Got message, parsing: "{}"'.format(text))
 
             if text is not None:
                 post = None
@@ -803,7 +803,7 @@ class RipbotServer(object):
     def shutdown(self, signun, frame):
         """
         Gracefully shuts down flask server and ripbot.
-        :param signum: param from signal callback
+        :param signun: param from signal callback
         :param frame: param from signal callback
         """
         self.log.info('SIGTERM: shutting down')
