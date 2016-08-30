@@ -70,8 +70,7 @@ class GroupMeBot(object):
                 bot_name = self.bots[group_id]['name']
             except KeyError:
                 log.info('Missing group; restarting')
-                start()
-                return
+                sys.exit(0)
 
         else:
             log.error('No group_id. Unknown originating group.')
