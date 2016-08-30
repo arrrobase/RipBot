@@ -90,9 +90,12 @@ class GroupMeBot(object):
                 gifme = re.match('^(?:@)?(?:ripbot)?(?: )?gifme (.*)', text,
                                  re.IGNORECASE)
 
-                imageme = re.match('^(?:@)?(?:ripbot)?(?: )?image(?: )?me (.*)', text,
+                imageme = re.match('^(?:@)?(?:ripbot)?(?: )?image(?: )?(?:me)? (.*)', text,
                                    re.IGNORECASE)
-                animateme = re.match('^(?:@)?(?:ripbot)?(?: )?animate(?: )?me (.*)', text,
+                animateme = re.match('^(?:@)?(?:ripbot)?(?: )?animate(?: )?(?:me)? (.*)', text,
+                                   re.IGNORECASE)
+
+                youtube = re.match('^(?:@)?(?:ripbot)?(?: )?(?:youtube:yt(?: )?(?:me)? (.*)', text,
                                    re.IGNORECASE)
 
                 top_scores = re.match('^(?:@)?(?:ripbot )?topscores$',
@@ -116,6 +119,9 @@ class GroupMeBot(object):
 
                 if animateme is not None:
                     self.is_imageme(animateme, text, True)
+
+                if youtube is not None:
+                    self.is_youtube(animateme, text)
 
                 if top_scores is not None:
                     self.is_scores(text)
@@ -239,6 +245,45 @@ class GroupMeBot(object):
 
             except (TypeError, IndexError):
                 post_text = 'Sorry, no images matching those tags.'
+
+                try:
+                    sorry = gif(tag='sorry')['data']['image_url']
+
+                except:
+                    pass
+
+            self.post(post_text)
+
+            if sorry is not None:
+                self.post(sorry)
+
+    def is_youtube(self, match, text):
+        """
+        Response for querying an youtube video. Uses google custom search.
+        :param match: re match groups
+        :param text: message text
+        """
+        query = match.group(1).rstrip()
+        sorry = None
+
+        if len(query) > 0:
+            log.info('MATCH: youtube in {}.'.format(text))
+
+            try:
+                query = {
+                    'q': query,
+                    'part': 'snippet',
+                    'fields': 'items(id)',
+                    'safeSearch': 'none',
+                    'key': os.environ['CUSTOM_SEARCH_KEY']
+                }
+
+                r = requests.get('https://www.googleapis.com/youtube/v3/search', params=query)
+                videoId = random.choice(r.json()['items'])['id']['videoId']
+                post_text = 'https://www.youtube.com/watch?v={}.'.format(videoId)
+
+            except (TypeError, IndexError):
+                post_text = 'Sorry, no videos that search matching those tags.'
 
                 try:
                     sorry = gif(tag='sorry')['data']['image_url']
