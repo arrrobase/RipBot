@@ -65,8 +65,12 @@ class GroupMeBot(object):
             system = data['system']
 
         if 'group_id' in data:
-            group_id = int(data['group_id'])
-            bot_name = self.bots[group_id]['name']
+            try:
+                group_id = int(data['group_id'])
+                bot_name = self.bots[group_id]['name']
+            except KeyError:
+                log.info('Missing group; restarting')
+                start()
 
         else:
             log.error('No group_id. Unknown originating group.')
@@ -809,24 +813,12 @@ class RipbotServer(object):
         self.log.info('SIGTERM: shutting down')
         sys.exit(0)
 
-if __name__ == '__main__':
+def start():
     # get groupme API key
     groupy_key = os.environ.get('GROUPY_KEY', None)
     config.API_KEY = groupy_key
 
     is_test = os.environ.get('IS_TEST', False)
-
-    # which bot to use
-    # TODO: change which and group_id to environment variables
-    # if is_test:
-    #     which_bot = 'test-ripbot'
-    #     group_id = '23373961'
-    #
-    # else:
-    #     which_bot = 'ripbot'
-    #     group_id = '13678029'
-    #
-    # bot = Bot.list().filter(name=which_bot)[0]
 
     group_ids = [int(i.group_id) for i in Bot.list()]
     posts = [i.post for i in Bot.list()]
@@ -839,18 +831,26 @@ if __name__ == '__main__':
 
     # start server
     server = RipbotServer()
+    # GLOBALS ARE BAD
+    global log
     log = server.log
 
     # initialize bot
     # ripbot = GroupMeBot(bot.post)
+    global bot
     bot = GroupMeBot(bots)
 
     # initialize database class
+    global rip_dib
     rip_db = RipDB(group_ids)
 
     # initialize giphy
     giphy = Giphy()
+    global gif
     gif = giphy.random
 
     # init callbacks
     server.setup()
+
+if __name__ == '__main__':
+    start()
