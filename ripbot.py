@@ -53,6 +53,7 @@ class GroupMeBot(object):
         text = None
         system = None
         group_id = None
+        bot_name = None
 
         if 'name' in data:
             name = data['name']
@@ -65,6 +66,7 @@ class GroupMeBot(object):
 
         if 'group_id' in data:
             group_id = int(data['group_id'])
+            bot_name = self.bots[group_id]['name']
 
         else:
             log.error('No group_id. Unknown originating group.')
@@ -95,29 +97,38 @@ class GroupMeBot(object):
                 post = None
 
                 # matches string in format: '@First Last ++ more text'
-                plus_minus = re.match('^(.*?)(\+\+|\-\-)(.*)', text)
+                plus_minus = re.match(
+                    '^(.*?)(\+\+|\-\-)(.*)', text)
 
-                gifme = re.match('^(?:@)?(?:ripbot)?(?: )?gif(?: )?(?:me)? (.*)', text,
-                                 re.IGNORECASE)
+                gifme = re.match(
+                    '^(?:@)?(?:{})?(?: )?gif(?: )?(?:me)? (.*)'.format(bot_name),
+                    text, re.IGNORECASE)
 
-                imageme = re.match('^(?:@)?(?:ripbot)?(?: )?image(?: )?(?:me)? (.*)', text,
+                imageme = re.match(
+                    '^(?:@)?(?:ripbot)?(?: )?image(?: )?(?:me)? (.*)', text,
                                    re.IGNORECASE)
 
-                animateme = re.match('^(?:@)?(?:ripbot)?(?: )?animate(?: )?(?:me)? (.*)', text,
+                animateme = re.match(
+                    '^(?:@)?(?:ripbot)?(?: )?animate(?: )?(?:me)? (.*)', text,
                                    re.IGNORECASE)
 
-                youtube = re.match('^(?:@)?(?:ripbot)?(?: )?(?:youtube|yt)(?: )?(?:me)? (.*)', text,
+                youtube = re.match(
+                    '^(?:@)?(?:ripbot)?(?: )?(?:youtube|yt)(?: )?(?:me)? (.*)', text,
                                    re.IGNORECASE)
 
-                top_scores = re.match('^(?:@)?(?:ripbot )?topscores$',
+                top_scores = re.match(
+                    '^(?:@)?(?:ripbot )?topscores$',
                                       text, re.IGNORECASE)
 
-                bottom_scores = re.match('^(?:@)?(?:ripbot )?bottomscores$',
+                bottom_scores = re.match(
+                    '^(?:@)?(?:ripbot )?bottomscores$',
                                          text, re.IGNORECASE)
 
-                who = re.match('^(?:@)?(?:ripbot )who', text, re.IGNORECASE)
+                who = re.match(
+                    '^(?:@)?(?:ripbot )who', text, re.IGNORECASE)
 
-                why = re.match('^(?:@)?(?:ripbot )why', text, re.IGNORECASE)
+                why = re.match(
+                    '^(?:@)?(?:ripbot )why', text, re.IGNORECASE)
 
                 if plus_minus is not None:
                     post = self.is_plusminus(plus_minus, text)
@@ -159,7 +170,7 @@ class GroupMeBot(object):
         :param group_id: group to post to
         :param post: string of post, or iterable of posts
         """
-        post = self.bots[group_id]
+        post = self.bots[group_id]['post']
 
         try:
             post(to_post)
@@ -816,7 +827,11 @@ if __name__ == '__main__':
 
     bots = [int(i.group_id) for i in Bot.list()]
     posts = [i.post for i in Bot.list()]
-    bots = dict(zip(bots, posts))
+    names = Bot.list()
+
+    # nested dict of group_id, with post method and bot name
+    # eg: {23373961: {'post': <post method>, 'name': 'ripbot'}
+    bots = dict(zip(bots, [dict(zip(['post', 'name'], i)) for i in zip(posts, names)]))
 
     # start server
     server = RipbotServer()
