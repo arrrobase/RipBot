@@ -95,7 +95,7 @@ class GroupMeBot(object):
                 animateme = re.match('^(?:@)?(?:ripbot)?(?: )?animate(?: )?(?:me)? (.*)', text,
                                    re.IGNORECASE)
 
-                youtube = re.match('^(?:@)?(?:ripbot)?(?: )?(?:youtube:yt(?: )?(?:me)? (.*)', text,
+                youtube = re.match('^(?:@)?(?:ripbot)?(?: )?(?:youtube|yt)(?: )?(?:me)? (.*)', text,
                                    re.IGNORECASE)
 
                 top_scores = re.match('^(?:@)?(?:ripbot )?topscores$',
