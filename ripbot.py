@@ -381,7 +381,7 @@ class GroupMeBot(object):
         """
         Response for asking ripbot who.
         """
-        member = Group.list().filter(group_id=group_id)[0].members()
+        member = Group.list().filter(group_id=str(group_id))[0].members()
 
         intro = ['Signs Point to ',
                  'Looks like ',
@@ -418,7 +418,9 @@ class GroupMeBot(object):
         user_name = match.group(2)
         log.info('SYSTEM MATCH: new user detected.')
 
-        member = Group.list().filter(group_id=group_id)[0].members().filter(
+        member = Group.list().filter(group_id=str(group_id))[0].members(
+
+        ).filter(
             nickname=user_name)[0]
         user_id = int(member.user_id)
 
@@ -441,7 +443,9 @@ class GroupMeBot(object):
         log.info('SYSTEM MATCH: nickname change detected.')
 
         try:
-            member = Group.list().filter(group_id=group_id)[0].members().filter(
+            member = Group.list().filter(group_id=str(group_id))[0].members(
+
+            ).filter(
                 nickname=new_name)[0]
             user_id = int(member.user_id)
             log.info('GROUPY: Converted name to ID')
@@ -730,7 +734,8 @@ class Database(object):
         """
         if id is not None:
             try:
-                member = Group.list().filter(group_id=group_id)[0].members().filter(
+                member = Group.list().filter(group_id=str(group_id))[
+                    0].members().filter(
                     nickname=id)[0]
                 id = int(member.user_id)
                 log.info('ID: Got ID from Groupme. #{}'.format(id))
