@@ -77,6 +77,8 @@ class GroupMeBot(object):
             log.error('No group_id. Unknown originating group.')
             return
 
+        post = None
+
         # check if system message
         if system:
             log.info('BOT: Got system message, parsing...')
@@ -86,20 +88,16 @@ class GroupMeBot(object):
                 name_change = re.match('(.*) changed name to (.*)', text)
 
                 if new_user is not None:
-                    self.is_new_user(new_user, group_id)
+                    post = self.is_new_user(new_user, group_id)
 
-                elif name_change is not None:
-                    self.is_name_change(name_change, group_id)
-
-                else:
-                    log.info('No matches; ignoring.')
+                if name_change is not None:
+                    post = self.is_name_change(name_change, group_id)
 
         # non system messages not originating from ripbot
         elif name is not None and name != bot_name:
             log.info('BOT: Got message, parsing: "{}"'.format(text))
 
             if text is not None:
-                post = None
 
                 # matches string in format: '@First Last ++ more text'
                 plus_minus = re.match(
@@ -164,11 +162,11 @@ class GroupMeBot(object):
                 if why is not None:
                     post = self.is_why()
 
-                else:
-                    log.info('No matches; ignoring.')
+        if post is not None:
+            self.post(group_id, post)
 
-                if post is not None:
-                    self.post(group_id, post)
+        else:
+            log.info('No matches; ignoring.')
 
     def post(self, group_id, to_post):
         """
