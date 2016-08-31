@@ -444,6 +444,7 @@ class GroupMeBot(object):
             member = Group.list().filter(group_id=group_id)[0].members().filter(
                 nickname=new_name)[0]
             user_id = int(member.user_id)
+            log.info('GROUPY: Converted name to ID')
 
             # check if user already in DB
             if not db.exists(user_id, group_id):
@@ -453,6 +454,8 @@ class GroupMeBot(object):
 
         except IndexError:  # fallback to switching by name rather than user_id
             user_id = user_name
+            log.warning('GROUPY: Could not find user_id, falling back to '
+                        'name.')
 
         db.change_player_name(new_name, user_id, group_id)
 
