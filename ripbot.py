@@ -174,12 +174,8 @@ class GroupMeBot(object):
                     post = self.is_why(text)
 
                 if when_where is not None:
-                    # log.info(bot_name)
-                    log.info('"{}"'.format(bot_name))
-                    log.info('"{}"'.format('test-ripbot'))
-                    if str(bot_name) == 'test-ripbot':
-                        log.info('Got this far')
-                    post = self.is_when_where(when_where, text)
+                    if str(bot_name) in ['test-ripbot', 'ripbot']:
+                        post = self.is_when_where(when_where, text)
 
         if post is not None:
             self.post(group_id, post)
