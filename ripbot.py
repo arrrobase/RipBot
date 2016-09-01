@@ -175,7 +175,7 @@ class GroupMeBot(object):
 
                 if when_where is not None:
                     log.info(bot_name)
-                    if bot_name in ['ripbot', 'test-ripbot']:
+                    if bot_name == 'test-ripbot':
                         log.info('Got this far')
                     post = self.is_when_where(when_where, text)
 
@@ -480,11 +480,11 @@ class GroupMeBot(object):
             where = event['location']
 
             dt = dateutil.parser.parse(when)
-            when = dt.strftime('%A %b. %w at %I:%M %p')
+            when = dt.strftime('%a. %b. %w at %I:%M %p')
 
             post_text = '>'
             post_text += what
-            post_text += '\nlocation: {}'.format(where)
+            post_text += '\n\nlocation: {}'.format(where)
             post_text += '\ntime: {}'.format(when)
 
         return post_text
