@@ -501,7 +501,7 @@ class GroupMeBot(object):
                 where = event['location']
 
             dt = dateutil.parser.parse(when)
-            when = dt.strftime('%a. %b. %w at %I:%M %p')
+            when = dt.strftime('%a. %b. %d at %I:%M %p')
 
             post_text = '>'
             post_text += what
@@ -548,7 +548,7 @@ class GroupMeBot(object):
                     where = event['location']
 
                 dt = dateutil.parser.parse(when)
-                when = dt.strftime('%a. %b. %w at %I:%M %p')
+                when = dt.strftime('%a. %b. %d at %I:%M %p')
 
                 post_text += what
                 post_text += '\nlocation: {}'.format(where)
