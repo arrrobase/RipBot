@@ -446,6 +446,8 @@ class GroupMeBot(object):
         """
         scopes = ['https://www.googleapis.com/auth/calendar.readonly']
 
+        log.info(os.environ['CAL_KEY_ID'])
+
         keyfile = {
             "type": "service_account",
             "project_id": "groupemebot",
