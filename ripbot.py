@@ -472,7 +472,7 @@ class GroupMeBot(object):
 
         query = match.group(1).rstrip().lstrip()
         query = query.rstrip('.!?')
-        log.info('Querying calendar with "".'.format(query))
+        log.info('Querying calendar with "{}".'.format(query))
 
         now = datetime.datetime.utcnow().isoformat() + 'Z' # 'Z' indicates UTC time
 
