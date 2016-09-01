@@ -14,14 +14,20 @@ import logging
 import signal
 import requests
 
+# google cal search import
+from oauth2client.service_account import ServiceAccountCredentials
+from httplib2 import Http
+from apiclient import discovery
+
 from random import randint
 import urllib.parse as urlparse
+import datetime
 import psycopg2
+import random
 import json
 import sys
 import os
 import re
-import random
 
 
 class GroupMeBot(object):
@@ -135,6 +141,10 @@ class GroupMeBot(object):
                     '^(?:@)?(?:{} )why'.format(bot_name),
                     text, re.IGNORECASE)
 
+                when_where = re.match(
+                    '^(?:@)?(?:{} )(?:when|where)(?:is|\'s) (.*)'.format(bot_name),
+                    text, re.IGNORECASE)
+
                 if plus_minus is not None:
                     post = self.is_plusminus(plus_minus, text, group_id)
 
@@ -157,10 +167,14 @@ class GroupMeBot(object):
                     post = self.is_scores(text, group_id, False)
 
                 if who is not None:
-                    post = self.is_who(group_id)
+                    post = self.is_who(text, group_id)
 
                 if why is not None:
-                    post = self.is_why()
+                    post = self.is_why(text)
+
+                if when_where is not None:
+                    if bot_name in ['ripbot', 'test-ripbot']:
+                        post = self.is_when_where(when_where, text)
 
         if post is not None:
             self.post(group_id, post)
@@ -375,10 +389,12 @@ class GroupMeBot(object):
 
         return post_text
 
-    def is_who(self, group_id):
+    def is_who(self, text, group_id):
         """
         Response for asking ripbot who.
         """
+        log.info('MATCH: who in "{}".'.format(text))
+
         member = Group.list().filter(group_id=str(group_id))[0].members()
 
         intro = ['Signs Point to ',
@@ -390,10 +406,11 @@ class GroupMeBot(object):
 
         return post_text
 
-    def is_why(self):
+    def is_why(self, text):
         """
         Response for asking ripbot why.
         """
+        log.info('MATCH: why in "{}".'.format(text))
 
         reasons = [
             'Because his dinner isn\'t ready',
@@ -405,6 +422,63 @@ class GroupMeBot(object):
         ]
 
         post_text = random.choice(reasons)
+
+        return post_text
+
+    def is_when_where(self, match, text):
+        """
+        Response for asking ripbot when or where for calendar query.
+        """
+        log.info('MATCH: when_where in "{}".'.format(text))
+
+        query = match.group(1).rstrip().lstrip()
+        query = query.rstrip('.!?')
+
+        scopes = ['https://www.googleapis.com/auth/calendar.readonly']
+
+        keyfile = {
+            "type": "service_account",
+            "project_id": "groupemebot",
+            "private_key_id": "4abc03b0c291afedcb3e0c72add9cbc5f6e42fdf",
+            "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQDDw8x3FHOi1s5J\n2veueLoEfrc1zABZ9kwj8+uUyNboBE6gdsSwxatnUnbf6hKe+qvCKtkGMheudHvn\nmD75G2nRpoYEn8YIjWo9AVJgkVSvrfNGtZcCFXzKlmCKt10uz1Dz4G4tDOEpD9sr\nesZhjJ+VL3ScDRuQ5ty3ZQUVQXJymzh2t8JZzzOQvzA/5ZxiPVfYL1hIyPxKcu+6\nLuUu6pDZKs8oHQwIMxTULMfqp2tvcif5WKrtpIrzX4ZC0BjMC+gFMkSFmJ10+KfL\n3IDqyFH1NK6mvjQ/huNBJi10p9AcSkgqUNocvE2avEWQ583aZ4oBpTv97xyemQtF\nzzQZmus5AgMBAAECggEBAKtcPiNSdLJq42JE2SARL4t1vDvMGdalwRqLjoDLmUq5\nUnYl4KB4N0SXK9VvGOOuuyCYzyYcPRyJfFhKrXzy4RsScCemD/w2hXNnL8u2C3JI\nizYvCENbucPABDwIq/mooc0IfIjUyFdgONKDgxmqtZoqUyGyW5noa/Xg6KUlh+AG\ntWQV0HF3GwtLHMhCYuwryMTRp5jGbBkfdexxV1Yx4CRlEOMw/6OFRAXtEc1Sgmyn\nYPSdQRuE6M2rdQUkBseTOrdLwQHs+SpgqbMA/rdvZP8fRSyN+0pC/uiXqXA0LYST\nSr4xdDh6XTdH2xQ41LDamNqGUyzjDxf7JW7YKn5Py4ECgYEA4aWTAuoW6MmceC/n\n90S1PfTRUkOlvW0RFwi8ww1+LNBIl9hWau1xqUU2M7886FnblW2fG8GF+RDJSkFC\nndO4Syi2U4+xS7WP7jlT2B58xxegdVnbzmCuNH+PerwUJem4oHMXZZZCNBMIjGp/\nVMNiCnpGnJ7zwEeF1d3ZCnt8qmkCgYEA3hkz+LKp7xk8ZVbqvbSnxrRcptQiioK0\nzdYZfumR4hXq7POwNwdW85VZPuu4sjP99hc52lE74e9reeTM82azsqmlMheVBqol\nY9O4B66h48q2/61JduTSBz6wDvBng57P5qzG39FAnFqs1gR/fIp0vrniX+ZmVM6o\n8Py2NF7BAFECgYA5TXX3AIGO3lw4/Vl4Jt+r+zcJIBq/7ymu4s4k7pFDSiWVQiA4\nCVKa/POV0pPiIaes2+jTAKNIK+YiUE5djD26AH3E3LHWmyYRBkfvk1Z2rN5XztkO\nIOk8dcR3E7o+Iot7W57ucmkfllHObuElInUMWh8CeS9HfiJTvIH4soFnOQKBgHYh\nXZ1IGk7MU21rX4vrjNmJkUZCyuR1RQm+eO0h+rAQDFZf/zgltT/2DfQDmMdgFBJS\npDjUwE8Z80ZwRfqog6fhx7XvCRr0YNLKB7Y+UmlApzkyyEJuzq9/zlED2WsOi3Ic\nL+NX/0+qgweKeOybECFp6Vgsyf0NtpoHMDqGs40hAoGAAgMnuMQMtaCJ3SUjDJt5\nhsSeJMNX+ZlcK10qp6frllYkr+YKC9TUdUj1M93OE0WMkTXmkkdDw5HQtHpEFtbo\nFkJv/oClJG7SVZG2EFkYoryDY9tRfR0l+72zf28Yo463Jl6o/s6Q7peuVsVI7OR4\ncytjkqN7RViEi72/axWIvi0=\n-----END PRIVATE KEY-----\n",
+            "client_email": "ripbotcal@groupemebot.iam.gserviceaccount.com",
+            "client_id": "114400750037198291116",
+            "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+            "token_uri": "https://accounts.google.com/o/oauth2/token",
+            "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+            "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/ripbotcal%40groupemebot.iam.gserviceaccount.com"
+        }
+
+        credentials = ServiceAccountCredentials.from_json_keyfile_dict(keyfile, scopes)
+
+        http_auth = credentials.authorize(Http())
+        service = discovery.build('calendar', 'v3', http=http_auth)
+
+        now = datetime.datetime.utcnow().isoformat() + 'Z' # 'Z' indicates UTC time
+
+        eventResult = service.events().list(
+            calendarId='5d1j2fnq4irkl6q15va06f6e4g@group.calendar.google.com',
+            timeMin=now,
+            maxResults=1,
+            singleEvents=True,
+            q=query,
+            fields='items(location, summary, start)',
+            orderBy='startTime').execute()
+
+        event = eventResult.get('items', [])
+
+        if not event:
+            post_text = 'No upcoming event found.'
+
+        else:
+            what = event['summary']
+            when = event['start']['dateTime']
+            where = event['location']
+
+            post_text = '>'
+            post_text += what
+            post_text += '\ntime: {}'.format(when)
+            post_text += '\nlocation: {}'.format(where)
 
         return post_text
 

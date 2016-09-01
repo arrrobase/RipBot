@@ -3,3 +3,4 @@ GroupyAPI
 psycopg2
 safygiphy
 requests
+google-api-python-client
