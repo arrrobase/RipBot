@@ -41,6 +41,10 @@ class GroupMeBot(object):
 
         self.cal_service = self.setup_calservice()
 
+        if os.environ.get('IS_TEST', False):
+            # post to test
+            self.post(23373961, 'Updated')
+
     def callback(self):
         """
         Method to send responses on callbacks.
