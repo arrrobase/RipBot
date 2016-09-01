@@ -21,6 +21,7 @@ from apiclient import discovery
 
 from random import randint
 import urllib.parse as urlparse
+import dateutil.parser
 import datetime
 import psycopg2
 import random
@@ -475,10 +476,13 @@ class GroupMeBot(object):
             when = event['start']['dateTime']
             where = event['location']
 
+            dt = dateutil.parser.parse(when)
+            when = dt.strftime('%A %b. %w at %I:%M %p')
+
             post_text = '>'
             post_text += what
-            post_text += '\ntime: {}'.format(when)
             post_text += '\nlocation: {}'.format(where)
+            post_text += '\ntime: {}'.format(when)
 
         return post_text
 
