@@ -148,6 +148,10 @@ class GroupMeBot(object):
                     '^(?:@)?(?:{} )(?:when|where)(?: is|\'s)(?: the next)? (.*)'.format(bot_name),
                     text, re.IGNORECASE)
 
+                agenda = re.match(
+                    '^(?:@)?(?:{} )?agenda( \d)?$'.format(bot_name),
+                    text, re.IGNORECASE)
+
                 if plus_minus is not None:
                     post = self.is_plusminus(plus_minus, text, group_id)
 
@@ -178,6 +182,9 @@ class GroupMeBot(object):
                 if when_where is not None:
                     if str(bot_name) in ['test-ripbot', 'ripbot']:
                         post = self.is_when_where(when_where, text)
+
+                if agenda is not None:
+                    post = self.is_agenda(agenda, text)
 
         if post is not None:
             self.post(group_id, post)
@@ -468,7 +475,7 @@ class GroupMeBot(object):
 
         now = datetime.datetime.utcnow().isoformat() + 'Z' # 'Z' indicates UTC time
 
-        eventResult = self.cal_service.events().list(
+        event_result = self.cal_service.events().list(
             calendarId='5d1j2fnq4irkl6q15va06f6e4g@group.calendar.google.com',
             timeMin=now,
             maxResults=1,
@@ -477,7 +484,7 @@ class GroupMeBot(object):
             fields='items(location, summary, start)',
             orderBy='startTime').execute()
 
-        event = eventResult.get('items', [])
+        event = event_result.get('items', [])
 
         if not event:
             post_text = 'No upcoming event found.'
@@ -498,6 +505,49 @@ class GroupMeBot(object):
 
         return post_text
 
+    def is_agenda(self, match, text):
+        """
+        Response for asking ripbot for agenda.
+        """
+        log.info('MATCH: agenda in "{}".'.format(text))
+
+        if match.group(1) is not None:
+            num = int(match.group(1).lstrip().rstrip())
+        else:
+            num = 3
+
+        now = datetime.datetime.utcnow().isoformat() + 'Z' # 'Z' indicates UTC time
+
+        events_result = self.cal_service.events().list(
+            calendarId='5d1j2fnq4irkl6q15va06f6e4g@group.calendar.google.com',
+            timeMin=now,
+            maxResults=num,
+            singleEvents=True,
+            fields='items(location, summary, start)',
+            orderBy='startTime').execute()
+
+        events = events_result.get('items', [])
+
+        if not events:
+            post_text = 'No upcoming event found.'
+
+        else:
+            post_text = '>'
+
+            for event in events:
+                what = event['summary']
+                when = event['start']['dateTime']
+                where = event['location']
+
+                dt = dateutil.parser.parse(when)
+                when = dt.strftime('%a. %b. %w at %I:%M %p')
+
+                post_text += what
+                post_text += '\nlocation: {}'.format(where)
+                post_text += '\ntime: {}\n\n'.format(when)
+
+        return post_text
+
     def is_new_user(self, match, group_id):
         """
         Response to new user. Welcomes them and adds them to db.
@@ -507,9 +557,7 @@ class GroupMeBot(object):
         log.info('SYSTEM MATCH: new user detected.')
 
         member = Group.list().filter(group_id=str(group_id))[0].members(
-
-        ).filter(
-            nickname=user_name)[0]
+            ).filter(nickname=user_name)[0]
         user_id = int(member.user_id)
 
         # check if user already in DB
