@@ -39,6 +39,8 @@ class GroupMeBot(object):
         self.bots = bots
         log.info('Ripbot up and running.')
 
+        self.cal_service = self.setup_calservice()
+
     def callback(self):
         """
         Method to send responses on callbacks.
@@ -426,15 +428,11 @@ class GroupMeBot(object):
 
         return post_text
 
-    def is_when_where(self, match, text):
+    def setup_calservice(self):
         """
-        Response for asking ripbot when or where for calendar query.
+        Sets up cal service.
+        :return: cal service
         """
-        log.info('MATCH: when_where in "{}".'.format(text))
-
-        query = match.group(1).rstrip().lstrip()
-        query = query.rstrip('.!?')
-
         scopes = ['https://www.googleapis.com/auth/calendar.readonly']
 
         keyfile = {
@@ -453,11 +451,24 @@ class GroupMeBot(object):
         credentials = ServiceAccountCredentials.from_json_keyfile_dict(keyfile, scopes)
 
         http_auth = credentials.authorize(Http())
+
         service = discovery.build('calendar', 'v3', http=http_auth)
+
+        return service
+
+    def is_when_where(self, match, text):
+        """
+        Response for asking ripbot when or where for calendar query.
+        """
+
+        log.info('MATCH: when_where in "{}".'.format(text))
+
+        query = match.group(1).rstrip().lstrip()
+        query = query.rstrip('.!?')
 
         now = datetime.datetime.utcnow().isoformat() + 'Z' # 'Z' indicates UTC time
 
-        eventResult = service.events().list(
+        eventResult = self.cal_service.events().list(
             calendarId='5d1j2fnq4irkl6q15va06f6e4g@group.calendar.google.com',
             timeMin=now,
             maxResults=1,
