@@ -145,7 +145,7 @@ class GroupMeBot(object):
                     text, re.IGNORECASE)
 
                 when_where = re.match(
-                    '^(?:@)?(?:{} )(?:when|where)(?: is|\'s)(?: the next)? (.*)'.format(bot_name),
+                    '^(?:@)?(?:{} )(?:when|where)(?: is|\'s)(?: the)?(?: next)? (.*)'.format(bot_name),
                     text, re.IGNORECASE)
 
                 agenda = re.match(
