@@ -143,7 +143,7 @@ class GroupMeBot(object):
                     text, re.IGNORECASE)
 
                 when_where = re.match(
-                    '^(?:@)?(?:{} )(?:when|where)(?:is|\'s) (.*)'.format(bot_name),
+                    '^(?:@)?(?:{} )(?:when|where)(?: is|\'s) (.*)'.format(bot_name),
                     text, re.IGNORECASE)
 
                 if plus_minus is not None:
@@ -174,6 +174,7 @@ class GroupMeBot(object):
                     post = self.is_why(text)
 
                 if when_where is not None:
+                    log.info('Got this far')
                     if bot_name in ['ripbot', 'test-ripbot']:
                         post = self.is_when_where(when_where, text)
 
