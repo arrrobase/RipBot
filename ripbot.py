@@ -149,7 +149,7 @@ class GroupMeBot(object):
                     text, re.IGNORECASE)
 
                 agenda = re.match(
-                    '^(?:@)?(?:{} )?agenda( \d)?$'.format(bot_name),
+                    '^(?:@)?(?:{} )?agenda(?: )(\d)?$'.format(bot_name),
                     text, re.IGNORECASE)
 
                 if plus_minus is not None:
@@ -535,15 +535,19 @@ class GroupMeBot(object):
             post_text = '>'
 
             for event in events:
+                where = None
+
                 what = event['summary']
                 when = event['start']['dateTime']
-                where = event['location']
+                if 'location' in event:
+                    where = event['location']
 
                 dt = dateutil.parser.parse(when)
                 when = dt.strftime('%a. %b. %w at %I:%M %p')
 
                 post_text += what
-                post_text += '\nlocation: {}'.format(where)
+                if where is not None:
+                    post_text += '\nlocation: {}'.format(where)
                 post_text += '\ntime: {}\n\n'.format(when)
 
         return post_text
