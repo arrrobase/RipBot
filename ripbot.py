@@ -474,6 +474,7 @@ class GroupMeBot(object):
             post_text = 'No upcoming event found.'
 
         else:
+            event = event[0]
             what = event['summary']
             when = event['start']['dateTime']
             where = event['location']
