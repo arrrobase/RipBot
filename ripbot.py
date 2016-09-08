@@ -486,11 +486,11 @@ class GroupMeBot(object):
 
         calendars = {
             'rip' : '5d1j2fnq4irkl6q15va06f6e4g@group.calendar.google.com',
-            'reed': None
+            'reed': 'reedmensultimate@gmail.com'
         }
 
         if cal in ['ripbot', 'test-ripbot']:
-            calendar = calendars['rip']
+            calendar = calendars['reed']
         elif cal == 'krom':
             calendar = calendars['reed']
 
