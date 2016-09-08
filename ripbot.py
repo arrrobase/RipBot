@@ -189,7 +189,9 @@ class GroupMeBot(object):
                                                   str(bot_name))
 
                 if agenda is not None:
-                    post = self.is_agenda(agenda, text)
+                    if str(bot_name) in ['test-ripbot', 'ripbot', 'krom']:
+                        post = self.is_agenda(agenda, text,
+                                              str(bot_name))
 
         if post is not None:
             self.post(group_id, post)
@@ -490,7 +492,7 @@ class GroupMeBot(object):
         }
 
         if cal in ['ripbot', 'test-ripbot']:
-            calendar = calendars['reed']
+            calendar = calendars['rip']
         elif cal == 'krom':
             calendar = calendars['reed']
 
@@ -504,7 +506,7 @@ class GroupMeBot(object):
                 fields='items(location, summary, start)',
                 orderBy='startTime').execute()
         except:
-            return 'something went wrong'
+            return 'Something went wrong'
 
         event = event_result.get('items', [])
 
@@ -531,7 +533,7 @@ class GroupMeBot(object):
 
         return post_text
 
-    def is_agenda(self, match, text):
+    def is_agenda(self, match, text, cal):
         """
         Response for asking ripbot for agenda.
         """
@@ -544,13 +546,26 @@ class GroupMeBot(object):
 
         now = datetime.datetime.utcnow().isoformat() + 'Z' # 'Z' indicates UTC time
 
-        events_result = self.cal_service.events().list(
-            calendarId='5d1j2fnq4irkl6q15va06f6e4g@group.calendar.google.com',
-            timeMin=now,
-            maxResults=num,
-            singleEvents=True,
-            fields='items(location, summary, start)',
-            orderBy='startTime').execute()
+        calendars = {
+            'rip' : '5d1j2fnq4irkl6q15va06f6e4g@group.calendar.google.com',
+            'reed': 'reedmensultimate@gmail.com'
+        }
+
+        if cal in ['ripbot', 'test-ripbot']:
+            calendar = calendars['rip']
+        elif cal == 'krom':
+            calendar = calendars['reed']
+
+        try:
+            events_result = self.cal_service.events().list(
+                calendarId=calendar,
+                timeMin=now,
+                maxResults=num,
+                singleEvents=True,
+                fields='items(location, summary, start)',
+                orderBy='startTime').execute()
+        except:
+            return 'Something went wrong.'
 
         events = events_result.get('items', [])
 
