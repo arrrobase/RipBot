@@ -519,12 +519,18 @@ class GroupMeBot(object):
             where = 'TBD'
 
             what = event['summary']
-            when = event['start']['dateTime']
+
+            try: # to handle all day events
+                when = event['start']['dateTime']
+                dt = dateutil.parser.parse(when)
+                when = dt.strftime('%a. %b. %d at %I:%M %p')
+            except KeyError:
+                when = event['start']['date']
+                dt = dateutil.parser.parse(when)
+                when = dt.strftime('%a. %b. %d')
+
             if 'location' in event:
                 where = event['location']
-
-            dt = dateutil.parser.parse(when)
-            when = dt.strftime('%a. %b. %d at %I:%M %p')
 
             post_text = '>'
             post_text += what
