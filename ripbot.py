@@ -184,8 +184,9 @@ class GroupMeBot(object):
                     post = self.is_why(text)
 
                 if when_where is not None:
-                    if str(bot_name) in ['test-ripbot', 'ripbot']:
-                        post = self.is_when_where(when_where, text)
+                    if str(bot_name) in ['test-ripbot', 'ripbot', 'krom']:
+                        post = self.is_when_where(when_where, text,
+                                                  str(bot_name))
 
                 if agenda is not None:
                     post = self.is_agenda(agenda, text)
@@ -470,7 +471,7 @@ class GroupMeBot(object):
 
         return service
 
-    def is_when_where(self, match, text):
+    def is_when_where(self, match, text, cal):
         """
         Response for asking ripbot when or where for calendar query.
         """
@@ -483,14 +484,27 @@ class GroupMeBot(object):
 
         now = datetime.datetime.utcnow().isoformat() + 'Z' # 'Z' indicates UTC time
 
-        event_result = self.cal_service.events().list(
-            calendarId='5d1j2fnq4irkl6q15va06f6e4g@group.calendar.google.com',
-            timeMin=now,
-            maxResults=1,
-            singleEvents=True,
-            q=query,
-            fields='items(location, summary, start)',
-            orderBy='startTime').execute()
+        calendars = {
+            'rip' : '5d1j2fnq4irkl6q15va06f6e4g@group.calendar.google.com',
+            'reed': None
+        }
+
+        if cal in ['ripbot', 'test-ripbot']:
+            calendar = calendars['rip']
+        elif cal == 'krom':
+            calendar = calendars['reed']
+
+        try:
+            event_result = self.cal_service.events().list(
+                calendarId=calendar,
+                timeMin=now,
+                maxResults=1,
+                singleEvents=True,
+                q=query,
+                fields='items(location, summary, start)',
+                orderBy='startTime').execute()
+        except:
+            return 'something went wrong'
 
         event = event_result.get('items', [])
 
