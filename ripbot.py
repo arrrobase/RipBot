@@ -234,6 +234,9 @@ class GroupMeBot(object):
             log.info('MATCH: plusminus to {} in "{}".'.format(points_to,
                                                               text))
 
+            if group_id == 6577279 and points_to == 'Matt':
+                plus_or_minus = '++'
+
             if plus_or_minus == '++':
                 if points_to.lower() == 'chipotle':
                     points = db.sub_point(points_to, group_id)
@@ -866,7 +869,6 @@ class Database(object):
     def get_scores(self, group_id, top=True):
         """
         Gets top 10 scorers
-        :return:
         """
         if top:
             sql = 'SELECT name, points FROM \"{}\" ORDER BY points DESC LIMIT 10'
@@ -891,7 +893,6 @@ class Database(object):
         Changes the players name in the db
         :param new_name:
         :param id:
-        :return:
         """
         if type(id) == int:
             sql = "UPDATE \"{}\" SET name='{}' WHERE id={}"
