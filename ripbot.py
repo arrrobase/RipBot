@@ -735,7 +735,7 @@ class Database(object):
         :param name: groupme nickname
         :param points: points to start with
         """
-        sql = "INSERT INTO \"{}\" VALUES({}, \"{}\", {})"
+        sql = "INSERT INTO \"{}\" VALUES({}, '{}', {})"
 
         if self.con is not None:
             try:
