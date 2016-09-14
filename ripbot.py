@@ -687,7 +687,7 @@ class Database(object):
             # check if tables exist, if not create
             for group_id in group_ids:
                 sql = "SELECT EXISTS(SELECT 1 FROM information_schema.tables " \
-                      "WHERE table_name='{}')".format(group_id)
+                      "WHERE table_name=\"{}\")".format(group_id)
 
                 self.cur.execute(sql)
                 table_exists = self.cur.fetchone()[0]
@@ -732,10 +732,11 @@ class Database(object):
         :param name: groupme nickname
         :param points: points to start with
         """
-        sql = "INSERT INTO \"{}\" VALUES({}, '{}', {})"
+        sql = "INSERT INTO \"{}\" VALUES({}, \"{}\", {})"
 
         if self.con is not None:
             try:
+                name = name.replace('\"', '')
                 self.cur.execute(sql.format(group_id, id, name, points))
                 self.con.commit()
                 log.info('DB: Added {} to table with id# {} and {} point('
@@ -757,7 +758,8 @@ class Database(object):
             sql = "SELECT points FROM \"{}\" WHERE id={}"
 
         else:
-            sql = "SELECT points FROM \"{}\" WHERE LOWER(name)=LOWER('{}')"
+            id = id.replace('\"')
+            sql = "SELECT points FROM \"{}\" WHERE LOWER(name)=LOWER(\"{}\")"
 
         if self.con is not None:
             try:
@@ -802,8 +804,9 @@ class Database(object):
             sql = "UPDATE \"{}\" SET points = points + 1 WHERE id={}"
 
         else:
+            id = id.replace('\"', '')
             sql = "UPDATE \"{}\" SET points = points + 1 WHERE " \
-                  "LOWER(name)=LOWER('{}')"
+                  "LOWER(name)=LOWER(\"{}\")"
 
         if self.con is not None:
             try:
@@ -843,8 +846,9 @@ class Database(object):
             sql = "UPDATE \"{}\" SET points = points - 1 WHERE id={}"
 
         else:
+            id = id.replace('\"')
             sql = "UPDATE \"{}\" SET points = points - 1 WHERE " \
-                  "LOWER(name)=LOWER('{}')"
+                  "LOWER(name)=LOWER(\"{}\")"
 
         if self.con is not None:
             try:
@@ -897,7 +901,9 @@ class Database(object):
             sql = "UPDATE \"{}\" SET name='{}' WHERE id={}"
 
         else:
-            sql = "UPDATE \"{}\" SET name='{}' WHERE LOWER(name)=LOWER('{}')"
+            id = id.replace('\"')
+            new_name = new_name.replace('\"')
+            sql = "UPDATE \"{}\" SET name=\"{}\" WHERE LOWER(name)=LOWER(\"{}\")"
 
         if self.con is not None:
             try:
