@@ -690,7 +690,7 @@ class Database(object):
             # check if tables exist, if not create
             for group_id in group_ids:
                 sql = "SELECT EXISTS(SELECT 1 FROM information_schema.tables " \
-                      "WHERE table_name=\"{}\")".format(group_id)
+                      "WHERE table_name={})".format(group_id)
 
                 self.cur.execute(sql)
                 table_exists = self.cur.fetchone()[0]
@@ -761,7 +761,7 @@ class Database(object):
             sql = "SELECT points FROM \"{}\" WHERE id={}"
 
         else:
-            id = id.replace('\"')
+            id = id.replace('\"', '')
             sql = "SELECT points FROM \"{}\" WHERE LOWER(name)=LOWER(\"{}\")"
 
         if self.con is not None:
@@ -849,7 +849,7 @@ class Database(object):
             sql = "UPDATE \"{}\" SET points = points - 1 WHERE id={}"
 
         else:
-            id = id.replace('\"')
+            id = id.replace('\"', '')
             sql = "UPDATE \"{}\" SET points = points - 1 WHERE " \
                   "LOWER(name)=LOWER(\"{}\")"
 
@@ -902,8 +902,8 @@ class Database(object):
             sql = "UPDATE \"{}\" SET name='{}' WHERE id={}"
 
         else:
-            id = id.replace('\"')
-            new_name = new_name.replace('\"')
+            id = id.replace('\"', '')
+            new_name = new_name.replace('\"', '')
             sql = "UPDATE \"{}\" SET name=\"{}\" WHERE LOWER(name)=LOWER(\"{}\")"
 
         if self.con is not None:
