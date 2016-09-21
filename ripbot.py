@@ -489,7 +489,7 @@ class GroupMeBot(object):
         post_text = ''
         post_text += '>Election forecast per 538:\n'
 
-        for k, v in forecast.iteritems():
+        for k, v in forecast.items():
             post_text += '\n{}: {}%'.format(k, v)
 
         post_text += '\n\nsource: http://projects.fivethirtyeight.com/2016-election-forecast/'
