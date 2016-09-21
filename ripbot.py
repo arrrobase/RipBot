@@ -19,7 +19,7 @@ from oauth2client.service_account import ServiceAccountCredentials
 from httplib2 import Http
 from apiclient import discovery
 
-from BeautifulSoup import BeautifulSoup as bs
+from bs4 import BeautifulSoup as bs
 from random import randint
 import urllib.parse as urlparse
 import dateutil.parser
@@ -466,7 +466,7 @@ class GroupMeBot(object):
         site = 'http://projects.fivethirtyeight.com/2016-election-forecast/'
 
         r = requests.get(site)
-        soup = bs(r.text)
+        soup = bs(r.text, 'html.parser')
 
         win_prob = soup.findAll('div', {'data-card':'winprob-sentence',
                                      'class':'card card-winprob card-winprob-us '
