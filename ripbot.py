@@ -19,6 +19,7 @@ from oauth2client.service_account import ServiceAccountCredentials
 from httplib2 import Http
 from apiclient import discovery
 
+from BeautifulSoup import BeautifulSoup as bs
 from random import randint
 import urllib.parse as urlparse
 import dateutil.parser
@@ -156,6 +157,10 @@ class GroupMeBot(object):
                     '^(?:@)?(?:{} )?agenda(?: )?(\d)?$'.format(bot_name),
                     text, re.IGNORECASE)
 
+                forecast = re.match(
+                    '^(?:@)?(?:{} )?forecast'.format(bot_name),
+                    text, re.IGNORECASE)
+
                 if plus_minus is not None:
                     post = self.is_plusminus(plus_minus, text, group_id)
 
@@ -192,6 +197,10 @@ class GroupMeBot(object):
                     if str(bot_name) in ['test-ripbot', 'ripbot', 'krom']:
                         post = self.is_agenda(agenda, text,
                                               str(bot_name))
+
+                if forecast is not None:
+                    if str(bot_name) in ['test-ripbot']:
+                        post = self.is_forecast(text)
 
         if post is not None:
             self.post(group_id, post)
@@ -442,6 +451,48 @@ class GroupMeBot(object):
         ]
 
         post_text = random.choice(reasons)
+
+        return post_text
+
+    def is_forecast(self, text):
+        """
+        Gets election forecast from 538. Scraping isn't very robust.
+
+        :param text:
+        :return:
+        """
+        log.info('MATCH: forecast in "{}".'.format(text))
+
+        site = 'http://projects.fivethirtyeight.com/2016-election-forecast/'
+
+        r = requests.get(site)
+        soup = bs(r.text)
+
+        win_prob = soup.findAll('div', {'data-card':'winprob-sentence',
+                                     'class':'card card-winprob card-winprob-us '
+                                             'winprob-bar'})[0]
+
+        heads = win_prob.findAll('div', {'class':'candidates heads'})[0]
+
+        forecast = {}
+
+        for head in heads.contents:
+            candidates = head.findAll('div', {'class':'candidate-text'})
+
+            for candidate in candidates:
+                name = candidate.p.text
+                odds = candidate.findAll('p', {'data-key':'winprob'})[0].text
+                odds = float(odds.rstrip('%'))
+
+                forecast[name] = odds
+
+        post_text = ''
+        post_text += '>Election forecast per 538:\n'
+
+        for k, v in forecast.iteritems():
+            post_text += '\n{}: {}%'.format(k, v)
+
+        post_text += '\n\nsource: http://projects.fivethirtyeight.com/2016-election-forecast/'
 
         return post_text
 
