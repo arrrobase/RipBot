@@ -5,3 +5,4 @@ safygiphy
 requests
 google-api-python-client
 python-dateutil
+BeautifulSoup
