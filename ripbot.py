@@ -199,8 +199,8 @@ class GroupMeBot(object):
                                               str(bot_name))
 
                 if forecast is not None:
-                    if str(bot_name) in ['test-ripbot']:
-                        post = self.is_forecast(text)
+                    # if str(bot_name) in ['test-ripbot', 'ripbot']:
+                    post = self.is_forecast(text)
 
         if post is not None:
             self.post(group_id, post)
