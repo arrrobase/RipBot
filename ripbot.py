@@ -164,41 +164,41 @@ class GroupMeBot(object):
                 if plus_minus is not None:
                     post = self.is_plusminus(plus_minus, text, group_id)
 
-                if gifme is not None:
+                elif gifme is not None:
                     post = self.is_gifme(gifme, text)
 
-                if imageme is not None:
+                elif imageme is not None:
                     post = self.is_imageme(imageme, text)
 
-                if animateme is not None:
+                elif animateme is not None:
                     post = self.is_imageme(animateme, text, True)
 
-                if youtube is not None:
+                elif youtube is not None:
                     post = self.is_youtube(youtube, text)
 
-                if top_scores is not None:
+                elif top_scores is not None:
                     post = self.is_scores(text, group_id)
 
-                if bottom_scores is not None:
+                elif bottom_scores is not None:
                     post = self.is_scores(text, group_id, False)
 
-                if who is not None:
+                elif who is not None:
                     post = self.is_who(text, group_id)
 
-                if why is not None:
+                elif why is not None:
                     post = self.is_why(text)
 
-                if when_where is not None:
+                elif when_where is not None:
                     if str(bot_name) in ['test-ripbot', 'ripbot', 'krom']:
                         post = self.is_when_where(when_where, text,
                                                   str(bot_name))
 
-                if agenda is not None:
+                elif agenda is not None:
                     if str(bot_name) in ['test-ripbot', 'ripbot', 'krom']:
                         post = self.is_agenda(agenda, text,
                                               str(bot_name))
 
-                if forecast is not None:
+                elif forecast is not None:
                     # if str(bot_name) in ['test-ripbot', 'ripbot']:
                     post = self.is_forecast(text)
 
@@ -468,20 +468,20 @@ class GroupMeBot(object):
         r = requests.get(site)
         soup = bs(r.text, 'html.parser')
 
-        win_prob = soup.findAll('div', {'data-card':'winprob-sentence',
-                                     'class':'card card-winprob card-winprob-us '
-                                             'winprob-bar'})[0]
+        win_prob = soup.findAll('div', {'data-card': 'winprob-sentence',
+                                        'class': 'card card-winprob card-winprob-us '
+                                        'winprob-bar'})[0]
 
-        heads = win_prob.findAll('div', {'class':'candidates heads'})[0]
+        heads = win_prob.findAll('div', {'class': 'candidates heads'})[0]
 
         forecast = {}
 
         for head in heads.contents:
-            candidates = head.findAll('div', {'class':'candidate-text'})
+            candidates = head.findAll('div', {'class': 'candidate-text'})
 
             for candidate in candidates:
                 name = candidate.p.text
-                odds = candidate.findAll('p', {'data-key':'winprob'})[0].text
+                odds = candidate.findAll('p', {'data-key': 'winprob'})[0].text
                 odds = float(odds.rstrip('%'))
 
                 forecast[name] = odds
@@ -538,7 +538,7 @@ class GroupMeBot(object):
         query = query.rstrip('.!?')
         log.info('Querying calendar with "{}".'.format(query))
 
-        now = datetime.datetime.utcnow().isoformat() + 'Z' # 'Z' indicates UTC time
+        now = datetime.datetime.utcnow().isoformat() + 'Z'  # 'Z' indicates UTC time
 
         calendars = {
             'rip' : '5d1j2fnq4irkl6q15va06f6e4g@group.calendar.google.com',
@@ -574,7 +574,7 @@ class GroupMeBot(object):
 
             what = event['summary']
 
-            try: # to handle all day events
+            try:  # to handle all day events
                 when = event['start']['dateTime']
                 dt = dateutil.parser.parse(when)
                 when = dt.strftime('%a. %b. %d at %I:%M %p')
@@ -604,7 +604,7 @@ class GroupMeBot(object):
         else:
             num = 3
 
-        now = datetime.datetime.utcnow().isoformat() + 'Z' # 'Z' indicates UTC time
+        now = datetime.datetime.utcnow().isoformat() + 'Z'  # 'Z' indicates UTC time
 
         calendars = {
             'rip' : '5d1j2fnq4irkl6q15va06f6e4g@group.calendar.google.com',
@@ -1064,6 +1064,7 @@ class RipbotServer(object):
         """
         self.log.info('SIGTERM: shutting down')
         sys.exit(0)
+
 
 def start():
     # get groupme API key
