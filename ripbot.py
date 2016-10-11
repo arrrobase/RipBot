@@ -110,6 +110,7 @@ class GroupMeBot(object):
         # non system messages not originating from ripbot
         elif name is not None and name != bot_name:
             log.info('BOT: Got message, parsing: "{}"'.format(text))
+            log.info('BOTNAME = {}'.format(bot_name))
 
             if text is not None:
 
@@ -158,7 +159,7 @@ class GroupMeBot(object):
                     text, re.IGNORECASE)
 
                 forecast = re.match(
-                    '^(?:@)?(?:{} )?forecast'.format(bot_name),
+                    '^(?:@)?(?:{} )?forecast$'.format(bot_name),
                     text, re.IGNORECASE)
 
                 if plus_minus is not None:
@@ -199,7 +200,6 @@ class GroupMeBot(object):
                                               str(bot_name))
 
                 elif forecast is not None:
-                    # if str(bot_name) in ['test-ripbot', 'ripbot']:
                     post = self.is_forecast(text)
 
         if post is not None:
