@@ -113,6 +113,8 @@ class GroupMeBot(object):
             log.info('BOTNAME = "{}"'.format(bot_name))
             log.info('NAME = "{}"'.format(name))
 
+            log.info(str(bot_name == name))
+
             if text is not None:
 
                 # matches string in format: '@First Last ++ more text'
