@@ -113,7 +113,7 @@ class GroupMeBot(object):
             log.info('BOTNAME = "{}"'.format(repr(bot_name)))
             log.info('NAME = "{}"'.format(repr(name)))
 
-            log.info(str(bot_name == name))
+            log.info(str(str(bot_name) == str(name)))
 
             if text is not None:
 
