@@ -108,12 +108,8 @@ class GroupMeBot(object):
                     post = self.is_name_change(name_change, group_id)
 
         # non system messages not originating from ripbot
-        elif name is not None and name != bot_name:
+        elif name is not None and str(name) != str(bot_name):
             log.info('BOT: Got message, parsing: "{}"'.format(text))
-            log.info('BOTNAME = "{}"'.format(repr(bot_name)))
-            log.info('NAME = "{}"'.format(repr(name)))
-
-            log.info(str(str(bot_name) == str(name)))
 
             if text is not None:
 
