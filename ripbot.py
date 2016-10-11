@@ -110,8 +110,8 @@ class GroupMeBot(object):
         # non system messages not originating from ripbot
         elif name is not None and name != bot_name:
             log.info('BOT: Got message, parsing: "{}"'.format(text))
-            log.info('BOTNAME = "{}"'.format(bot_name))
-            log.info('NAME = "{}"'.format(name))
+            log.info('BOTNAME = "{}"'.format(repr(bot_name)))
+            log.info('NAME = "{}"'.format(repr(name)))
 
             log.info(str(bot_name == name))
 
