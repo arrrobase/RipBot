@@ -73,7 +73,7 @@ class GroupMeBot(object):
             name = data['name']
 
         if 'text' in data:
-            text = data['text']
+            text = data['text'].strip()
 
         if 'system' in data:
             system = data['system']
@@ -230,11 +230,10 @@ class GroupMeBot(object):
         :param text: message text
         """
         plus_or_minus = match.group(2)
-        points_to = match.group(1).rstrip()
-        points_to = points_to.lstrip()
+        points_to = match.group(1).strip()
         points_to = points_to.lstrip('@')
 
-        what_for = match.group(3).lstrip().rstrip()
+        what_for = match.group(3).rstrip()
         what_for = re.sub(r"^(for|because)", '', what_for).lstrip()
         what_for = what_for.rstrip('.!?')
 
@@ -533,7 +532,7 @@ class GroupMeBot(object):
 
         log.info('MATCH: when_where in "{}".'.format(text))
 
-        query = match.group(1).rstrip().lstrip()
+        query = match.group(1).strip()
         query = query.rstrip('.!?')
         log.info('Querying calendar with "{}".'.format(query))
 
@@ -599,7 +598,7 @@ class GroupMeBot(object):
         log.info('MATCH: agenda in "{}".'.format(text))
 
         if match.group(1) is not None:
-            num = int(match.group(1).lstrip().rstrip())
+            num = int(match.group(1).strip())
         else:
             num = 3
 
