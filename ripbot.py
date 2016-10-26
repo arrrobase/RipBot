@@ -233,7 +233,7 @@ class GroupMeBot(object):
         points_to = match.group(1).strip()
         points_to = points_to.lstrip('@')
 
-        what_for = match.group(3).rstrip()
+        what_for = match.group(3).strip()
         what_for = re.sub(r"^(for|because)", '', what_for).lstrip()
         what_for = what_for.rstrip('.!?')
 
