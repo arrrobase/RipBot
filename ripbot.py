@@ -162,7 +162,7 @@ class GroupMeBot(object):
                     text, re.IGNORECASE)
 
                 if plus_minus is not None:
-                    post = self.is_plusminus(plus_minus, text, group_id)
+                    post = self.is_plusminus(plus_minus, text, group_id, bot_name)
 
                 elif gifme is not None:
                     post = self.is_gifme(gifme, text)
@@ -223,7 +223,7 @@ class GroupMeBot(object):
             for message in to_post:
                 post(message)
 
-    def is_plusminus(self, match, text, group_id):
+    def is_plusminus(self, match, text, group_id, bot_name):
         """
         Response for adding/subtracting points
         :param match: re match groups
@@ -243,6 +243,9 @@ class GroupMeBot(object):
 
             if group_id == 6577279 and points_to == 'Matt':
                 plus_or_minus = '++'
+
+            if points_to == bot_name:
+                return 'lol no'
 
             if plus_or_minus == '++':
                 if points_to.lower() == 'chipotle':
