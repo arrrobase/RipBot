@@ -229,7 +229,6 @@ class GroupMeBot(object):
         :param match: re match groups
         :param text: message text
         """
-        print(bot_name)
         plus_or_minus = match.group(2)
         points_to = match.group(1).strip()
         points_to = points_to.lstrip('@')
