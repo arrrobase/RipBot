@@ -229,6 +229,7 @@ class GroupMeBot(object):
         :param match: re match groups
         :param text: message text
         """
+        print(bot_name)
         plus_or_minus = match.group(2)
         points_to = match.group(1).strip()
         points_to = points_to.lstrip('@')
@@ -244,7 +245,7 @@ class GroupMeBot(object):
             if group_id == 6577279 and points_to == 'Matt':
                 plus_or_minus = '++'
 
-            if points_to == bot_name:
+            if points_to == bot_name and plus_or_minus == '--':
                 return 'lol no'
 
             if plus_or_minus == '++':
