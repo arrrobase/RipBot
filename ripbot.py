@@ -464,38 +464,38 @@ class GroupMeBot(object):
         """
         log.info('MATCH: forecast in "{}".'.format(text))
 
-        site = 'http://projects.fivethirtyeight.com/2016-election-forecast/'
+        # site = 'http://projects.fivethirtyeight.com/2016-election-forecast/'
+        #
+        # r = requests.get(site)
+        # soup = bs(r.text, 'html.parser')
+        #
+        # win_prob = soup.findAll('div', {'data-card': 'winprob-sentence',
+        #                                 'class': 'card card-winprob card-winprob-us '
+        #                                 'winprob-bar'})[0]
+        #
+        # heads = win_prob.findAll('div', {'class': 'candidates heads'})[0]
+        #
+        # forecast = {}
+        #
+        # for head in heads.contents:
+        #     candidates = head.findAll('div', {'class': 'candidate-text'})
+        #
+        #     for candidate in candidates:
+        #         name = candidate.p.text
+        #         odds = candidate.findAll('p', {'data-key': 'winprob'})[0].text
+        #         odds = float(odds.rstrip('%'))
+        #
+        #         forecast[name] = odds
+        #
+        # post_text = ''
+        # post_text += '>Election forecast per 538:\n'
+        #
+        # for k, v in forecast.items():
+        #     post_text += '\n{}: {}%'.format(k, v)
+        #
+        # post_text += '\n\nsource: http://projects.fivethirtyeight.com/2016-election-forecast/'
 
-        r = requests.get(site)
-        soup = bs(r.text, 'html.parser')
-
-        win_prob = soup.findAll('div', {'data-card': 'winprob-sentence',
-                                        'class': 'card card-winprob card-winprob-us '
-                                        'winprob-bar'})[0]
-
-        heads = win_prob.findAll('div', {'class': 'candidates heads'})[0]
-
-        forecast = {}
-
-        for head in heads.contents:
-            candidates = head.findAll('div', {'class': 'candidate-text'})
-
-            for candidate in candidates:
-                name = candidate.p.text
-                odds = candidate.findAll('p', {'data-key': 'winprob'})[0].text
-                odds = float(odds.rstrip('%'))
-
-                forecast[name] = odds
-
-        post_text = ''
-        post_text += '>Election forecast per 538:\n'
-
-        for k, v in forecast.items():
-            post_text += '\n{}: {}%'.format(k, v)
-
-        post_text += '\n\nsource: http://projects.fivethirtyeight.com/2016-election-forecast/'
-
-        return post_text
+        return '#toosoon'
 
     def setup_calservice(self):
         """
