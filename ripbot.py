@@ -244,7 +244,7 @@ class GroupMeBot(object):
             if group_id == 6577279 and points_to == 'Matt':
                 plus_or_minus = '++'
 
-            if points_to == str(bot_name) and plus_or_minus == '--':
+            if points_to.lower() == str(bot_name) and plus_or_minus == '--':
                 return 'lol no'
 
             if plus_or_minus == '++':
