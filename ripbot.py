@@ -451,7 +451,7 @@ class GroupMeBot(object):
             'Because their dinner isn\'t ready',
             'Because someone flushed his poop before he could look at it',
             'Because they like Chipotle... and didn\'t even plus plus it',
-            'Because their cat downloaded all of that child porn',
+            # 'Because their cat downloaded all of that child porn',
             'Because they\'re from Texas',
             'Because @AT made them do it'
         ]
@@ -530,13 +530,19 @@ class GroupMeBot(object):
 
         f = forecast(api_key, loc[0], loc[1])
 
-        rain = f.hourly().data[0].precipProbability * 100
-        rain = str(rain) + '% chance of rain. '
+        summary = f.hourly().summary
+        summary = summary + ' '
+
+        temp = int(f.hourly().data[0].temperature)
+        temp = str(temp) + ' °F, '
+
+        rain = int(f.hourly().data[0].precipProbability * 100)
+        rain = str(rain) + ' % chance of rain, '
 
         wind = f.hourly().data[0].windSpeed
-        wind = str(wind) + ' mph wind. '
+        wind = str(wind) + ' mph wind for the next hour.'
 
-        post_text = str(f.minutely().summary) + ' ' + rain + wind
+        post_text = summary + temp + rain + wind
 
         return post_text
 
