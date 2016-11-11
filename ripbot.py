@@ -530,9 +530,11 @@ class GroupMeBot(object):
 
         f = forecast(api_key, loc[0], loc[1])
 
+        # summary of the days weather
         summary = f.hourly().summary
         summary = summary + ' '
 
+        # specific details for the next hour
         temp = int(f.hourly().data[0].temperature)
         temp = str(temp) + ' °F, '
 
