@@ -163,7 +163,7 @@ class GroupMeBot(object):
 
                 forecast = re.match(
                     # '^(?:@)?(?:{} )?forecast$'.format(bot_name),  # elections
-                    '^(?:@)?(?:{})?(?: )?forecast (.*)'.format(bot_name),  # weather
+                    '^(?:@)?(?:{})?(?: )?forecast\b(.*)?'.format(bot_name),  # weather
                     text, re.IGNORECASE)
 
                 if plus_minus is not None:
@@ -513,7 +513,7 @@ class GroupMeBot(object):
         """
         log.info('MATCH: forecast in "{}".'.format(text))
 
-        query = match.group(1).rstrip()
+        query = match.group(1).strip()
 
         api_key = os.environ.get('FORECAST_KEY', None)
 
