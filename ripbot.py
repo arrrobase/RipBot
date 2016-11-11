@@ -163,7 +163,7 @@ class GroupMeBot(object):
 
                 forecast = re.match(
                     # '^(?:@)?(?:{} )?forecast$'.format(bot_name),  # elections
-                    '^(?:@)?(?:{})?(?: )?forecast(?: )?(.*)'.format(bot_name),  # weather
+                    '^(?:@)?(?:{})?(?: )?forecast (.*)'.format(bot_name),  # weather
                     text, re.IGNORECASE)
 
                 if plus_minus is not None:
