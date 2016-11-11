@@ -6,3 +6,5 @@ requests
 google-api-python-client
 python-dateutil
 beautifulsoup4
+python-forecastio
+geopy
