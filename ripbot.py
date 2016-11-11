@@ -163,7 +163,7 @@ class GroupMeBot(object):
 
                 forecast = re.match(
                     # '^(?:@)?(?:{} )?forecast$'.format(bot_name),  # elections
-                    '^(?:@)?(?:{})?(?: )?forecast\b(.*)?'.format(bot_name),  # weather
+                    r'^(?:@)?(?:{}\b)?(?: )?forecast\b(.*)?'.format(bot_name),  # weather
                     text, re.IGNORECASE)
 
                 if plus_minus is not None:
@@ -519,6 +519,8 @@ class GroupMeBot(object):
 
         if len(query) == 0:
             query = 'Portland, OR'
+        elif 'election' in query:
+            return '#toosoon'
 
         geo = Nominatim().geocode(query)
         if geo is None:
