@@ -163,7 +163,7 @@ class GroupMeBot(object):
 
                 forecast = re.match(
                     # '^(?:@)?(?:{} )?forecast$'.format(bot_name),  # elections
-                    '^(?:@)?(?:{})?(?: )?forecast(?: )?(?:me)? (.*)'.format(bot_name),  # weather
+                    '^(?:@)?(?:{})?(?: )?forecast(?: )?(.*)'.format(bot_name),  # weather
                     text, re.IGNORECASE)
 
                 if plus_minus is not None:
@@ -521,11 +521,17 @@ class GroupMeBot(object):
             query = 'Portland, OR'
 
         geo = Nominatim().geocode(query)
+        if geo is None:
+            return 'Sorry, location not found.'
+
         loc = (geo.latitude, geo.longitude)
 
         f = forecast(api_key, loc[0], loc[1])
 
-        post_text = str(f.hourly().summary)
+        rain = f.minutely().precipProbability * 100
+        rain = str(rain) + '% chance of rain.'
+
+        post_text = str(f.minutely().summary) + rain
 
         return post_text
 
