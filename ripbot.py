@@ -528,7 +528,7 @@ class GroupMeBot(object):
 
         loc = (geo.latitude, geo.longitude)
 
-        f = forecast(api_key, loc[0], loc[1])
+        f = forecast(api_key, loc[0], loc[1], units='us')
 
         # summary of the days weather
         summary = f.hourly().summary
