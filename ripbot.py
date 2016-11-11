@@ -528,7 +528,7 @@ class GroupMeBot(object):
 
         f = forecast(api_key, loc[0], loc[1])
 
-        rain = f.minutely().precipProbability * 100
+        rain = f.hourly().data[0].precipProbability * 100
         rain = str(rain) + '% chance of rain.'
 
         post_text = str(f.minutely().summary) + rain
