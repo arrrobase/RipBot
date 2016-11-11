@@ -448,12 +448,12 @@ class GroupMeBot(object):
         log.info('MATCH: why in "{}".'.format(text))
 
         reasons = [
-            'Because his dinner isn\'t ready',
+            'Because their dinner isn\'t ready',
             'Because someone flushed his poop before he could look at it',
-            'Because he likes Chipotle... and didn\'t even plus plus it',
-            'Because his cat downloaded all of that child porn',
-            'Because he is from Texas',
-            'Because @AT made him do it'
+            'Because they like Chipotle... and didn\'t even plus plus it',
+            'Because their cat downloaded all of that child porn',
+            'Because they\'re from Texas',
+            'Because @AT made them do it'
         ]
 
         post_text = random.choice(reasons)
