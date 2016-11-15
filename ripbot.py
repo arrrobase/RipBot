@@ -759,6 +759,8 @@ class GroupMeBot(object):
                 log.info('Making markov chain with start.')
                 post_text = self.markovs[group_id].make_sentence_with_start(
                     query.strip())
+                if post_text is None:
+                    raise KeyError
                 log.info('Chain made: {}'.format(post_text))
             except KeyError:
                 log.info('Failed at making chain, returning sorry.')
