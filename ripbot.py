@@ -756,9 +756,11 @@ class GroupMeBot(object):
 
         if match.group(1) is not None:
             try:
+                log.info('Making markov chain.')
                 return self.markovs[group_id].make_sentence_with_start(
                     query.strip())
             except KeyError:
+                log.info('Failed at making chain, returning sorry.')
                 sorry = self.is_gifme(None, None, True)
 
                 post_text = 'Couldn\'t make chain, sorry.'
