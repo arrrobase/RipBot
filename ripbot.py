@@ -724,6 +724,7 @@ class GroupMeBot(object):
         # make dict of all messages for each group
         self.markovs = {}
 
+        log.info('Generating markovs.')
         for group_id in group_ids:
             messages = Group.list().filter(group_id=str(group_id))[0].messages()
             while messages.iolder():
@@ -735,6 +736,8 @@ class GroupMeBot(object):
 
             text_model = markovify.NewlineText(corpus.getvalue())
             self.markovs[group_id] = text_model
+
+        log.info('Markovs generated.')
 
     def is_markov(self, group_id):
         """
