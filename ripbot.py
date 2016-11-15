@@ -170,9 +170,8 @@ class GroupMeBot(object):
                     text, re.IGNORECASE)
 
                 markov = re.match(
-                    r'^(?:@)?(?:{}\b)?(?: )?markov$'.format(bot_name),
-                    text, re.IGNORECASE
-                )
+                    r'^(?:@)?(?:{}\b)?(?: )?markov( \w+)?$'.format(bot_name),
+                    text, re.IGNORECASE)
 
                 if plus_minus is not None:
                     post = self.is_plusminus(plus_minus, text, group_id, bot_name)
@@ -215,7 +214,7 @@ class GroupMeBot(object):
                     post = self.is_forecast(forecast, text)
 
                 elif markov is not None:
-                    post = self.is_markov(group_id)
+                    post = self.is_markov(markov, group_id)
 
         if post is not None:
             self.post(group_id, post)
@@ -289,12 +288,18 @@ class GroupMeBot(object):
 
             return post_text
 
-    def is_gifme(self, match, text):
+    def is_gifme(self, match, text, sorry=False):
         """
         Response for querying a gif. Uses GiphyAPI.
         :param match: re match groups
         :param text: message text
         """
+        if sorry:
+            try:
+                return gif(tag='sorry')['data']['image_url']
+            except:
+                return ''
+
         query = match.group(1).rstrip()
         sorry = None
 
@@ -739,15 +744,25 @@ class GroupMeBot(object):
 
         log.info('Markovs generated.')
 
-    def is_markov(self, group_id):
+    def is_markov(self, match, group_id):
         """
         Generates a random markov chain from appropriate group.
 
         :param group_id:
         :return:
         """
-        return self.markovs[group_id].make_short_sentence(140)
+        query = match.group(1)
+        if match.group(1) is not None:
+            try:
+                self.markovs[group_id].make_sentence_with_start(query.strip())
+            except KeyError:
+                sorry = self.is_gifme(None, None, True)
 
+                post_text = 'First word not found, sorry.'
+                post_text = [post_text, sorry]
+
+        else:
+            return self.markovs[group_id].make_short_sentence(140)
 
     def is_new_user(self, match, group_id):
         """
