@@ -214,7 +214,7 @@ class GroupMeBot(object):
                     post = self.is_forecast(forecast, text)
 
                 elif markov is not None:
-                    post = self.is_markov(markov, group_id)
+                    post = self.is_markov(markov, text, group_id)
 
         if post is not None:
             self.post(group_id, post)
@@ -744,13 +744,14 @@ class GroupMeBot(object):
 
         log.info('Markovs generated.')
 
-    def is_markov(self, match, group_id):
+    def is_markov(self, match, text, group_id):
         """
         Generates a random markov chain from appropriate group.
 
         :param group_id:
         :return:
         """
+        log.info('MATCH: agenda in "{}".'.format(text))
         query = match.group(1)
         if match.group(1) is not None:
             try:
