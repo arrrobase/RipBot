@@ -761,7 +761,7 @@ class GroupMeBot(object):
             except KeyError:
                 sorry = self.is_gifme(None, None, True)
 
-                post_text = 'First word not found, sorry.'
+                post_text = 'Couldn\'t make chain, sorry.'
                 post_text = [post_text, sorry]
                 return post_text
 
