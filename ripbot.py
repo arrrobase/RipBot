@@ -751,16 +751,19 @@ class GroupMeBot(object):
         :param group_id:
         :return:
         """
-        log.info('MATCH: agenda in "{}".'.format(text))
+        log.info('MATCH: markov in "{}".'.format(text))
         query = match.group(1)
+
         if match.group(1) is not None:
             try:
-                self.markovs[group_id].make_sentence_with_start(query.strip())
+                return self.markovs[group_id].make_sentence_with_start(
+                    query.strip())
             except KeyError:
                 sorry = self.is_gifme(None, None, True)
 
                 post_text = 'First word not found, sorry.'
                 post_text = [post_text, sorry]
+                return post_text
 
         else:
             return self.markovs[group_id].make_short_sentence(140)
