@@ -27,6 +27,7 @@ from bs4 import BeautifulSoup as bs
 from random import randint
 import urllib.parse as urlparse
 import dateutil.parser
+import markovify
 import datetime
 import psycopg2
 import random
@@ -34,6 +35,7 @@ import json
 import sys
 import os
 import re
+import io
 
 
 class GroupMeBot(object):
@@ -45,6 +47,7 @@ class GroupMeBot(object):
         log.info('Ripbot up and running.')
 
         self.cal_service = self.setup_calservice()
+        self.setup_markovs()
 
         if os.environ.get('IS_TEST', False):
             # post to test
@@ -166,6 +169,11 @@ class GroupMeBot(object):
                     r'^(?:@)?(?:{}\b)?(?: )?forecast\b(.*)?'.format(bot_name),  # weather
                     text, re.IGNORECASE)
 
+                markov = re.match(
+                    r'^(?:@)?(?:{}\b)?(?: )?markov$'.format(bot_name),
+                    text, re.IGNORECASE
+                )
+
                 if plus_minus is not None:
                     post = self.is_plusminus(plus_minus, text, group_id, bot_name)
 
@@ -205,6 +213,9 @@ class GroupMeBot(object):
 
                 elif forecast is not None:
                     post = self.is_forecast(forecast, text)
+
+                elif markov is not None:
+                    post = self.is_markov(group_id)
 
         if post is not None:
             self.post(group_id, post)
@@ -704,9 +715,41 @@ class GroupMeBot(object):
 
         return post_text
 
+    def setup_markovs(self):
+        """
+        Creates dict of markov generators
+        """
+        group_ids = list(map(int, [bot.group_id for bot in Bot.list()]))
+
+        # make dict of all messages for each group
+        self.markovs = {}
+
+        for group_id in group_ids:
+            messages = Group.list().filter(group_id=str(group_id))[0].messages()
+            while messages.iolder():
+                pass
+
+            corpus = io.StringIO()
+            for m in messages:
+                corpus.write(str(m.text).strip() + '\n\n')
+
+            text_model = markovify.NewlineText(corpus.getvalue())
+            self.markovs[group_id] = text_model
+
+    def is_markov(self, group_id):
+        """
+        Generates a random markov chain from appropriate group.
+
+        :param group_id:
+        :return:
+        """
+        return self.markovs[group_id].make_short_sentence(140)
+
+
     def is_new_user(self, match, group_id):
         """
         Response to new user. Welcomes them and adds them to db.
+
         :param match: re match groups
         """
         user_name = match.group(2)

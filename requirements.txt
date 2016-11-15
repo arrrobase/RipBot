@@ -8,3 +8,4 @@ python-dateutil
 beautifulsoup4
 python-forecastio
 geopy
+markovify
