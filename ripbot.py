@@ -47,7 +47,7 @@ class GroupMeBot(object):
         log.info('Ripbot up and running.')
 
         self.cal_service = self.setup_calservice()
-        self.setup_markovs()
+        # self.setup_markovs()
 
         if os.environ.get('IS_TEST', False):
             # post to test
@@ -1229,6 +1229,9 @@ def start():
 
     # init callbacks
     server.setup()
+
+    # do long thing: setup markovs
+    bot.setup_markovs()
 
 if __name__ == '__main__':
     start()
