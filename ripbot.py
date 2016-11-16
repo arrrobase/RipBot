@@ -170,7 +170,7 @@ class GroupMeBot(object):
                     text, re.IGNORECASE)
 
                 markov = re.match(
-                    r'^(?:@)?(?:{}\b)?(?: )?markov( \w+)?$'.format(bot_name),
+                    r'^(?:@)?(?:{}\b)?(?: )?markov( \S+)?$'.format(bot_name),
                     text, re.IGNORECASE)
 
                 if plus_minus is not None:
@@ -249,7 +249,7 @@ class GroupMeBot(object):
         points_to = points_to.lstrip('@')
 
         what_for = match.group(3).strip()
-        what_for = re.sub(r"^(for|because)", '', what_for).lstrip()
+        what_for = re.sub(r"^(for|because|cause|cuz)", '', what_for).lstrip()
         what_for = what_for.rstrip('.!?')
 
         if type(points_to) == int or len(points_to) > 0:
