@@ -19,10 +19,15 @@ from oauth2client.service_account import ServiceAccountCredentials
 from httplib2 import Http
 from apiclient import discovery
 
+# forecast api
+from forecastio import load_forecast as forecast
+from geopy.geocoders import Nominatim
+
 from bs4 import BeautifulSoup as bs
 from random import randint
 import urllib.parse as urlparse
 import dateutil.parser
+import markovify
 import datetime
 import psycopg2
 import random
@@ -30,6 +35,7 @@ import json
 import sys
 import os
 import re
+import io
 
 
 class GroupMeBot(object):
@@ -38,9 +44,11 @@ class GroupMeBot(object):
     """
     def __init__(self, bots):
         self.bots = bots
-        log.info('Ripbot up and running.')
 
         self.cal_service = self.setup_calservice()
+        self.setup_markovs()
+
+        log.info('Ripbot up and ready.')
 
         if os.environ.get('IS_TEST', False):
             # post to test
@@ -158,11 +166,16 @@ class GroupMeBot(object):
                     text, re.IGNORECASE)
 
                 forecast = re.match(
-                    '^(?:@)?(?:{} )?forecast$'.format(bot_name),
+                    # '^(?:@)?(?:{} )?forecast$'.format(bot_name),  # elections
+                    r'^(?:@)?(?:{}\b)?(?: )?forecast\b(.*)?'.format(bot_name),  # weather
+                    text, re.IGNORECASE)
+
+                markov = re.match(
+                    r'^(?:@)?(?:{}\b)?(?: )?markov( \S+)?$'.format(bot_name),
                     text, re.IGNORECASE)
 
                 if plus_minus is not None:
-                    post = self.is_plusminus(plus_minus, text, group_id)
+                    post = self.is_plusminus(plus_minus, text, group_id, bot_name)
 
                 elif gifme is not None:
                     post = self.is_gifme(gifme, text)
@@ -199,7 +212,10 @@ class GroupMeBot(object):
                                               str(bot_name))
 
                 elif forecast is not None:
-                    post = self.is_forecast(text)
+                    post = self.is_forecast(forecast, text)
+
+                elif markov is not None:
+                    post = self.is_markov(markov, text, group_id)
 
         if post is not None:
             self.post(group_id, post)
@@ -223,7 +239,7 @@ class GroupMeBot(object):
             for message in to_post:
                 post(message)
 
-    def is_plusminus(self, match, text, group_id):
+    def is_plusminus(self, match, text, group_id, bot_name):
         """
         Response for adding/subtracting points
         :param match: re match groups
@@ -234,7 +250,7 @@ class GroupMeBot(object):
         points_to = points_to.lstrip('@')
 
         what_for = match.group(3).strip()
-        what_for = re.sub(r"^(for|because)", '', what_for).lstrip()
+        what_for = re.sub(r"^(for|because|cause|cuz)", '', what_for).lstrip()
         what_for = what_for.rstrip('.!?')
 
         if type(points_to) == int or len(points_to) > 0:
@@ -243,6 +259,9 @@ class GroupMeBot(object):
 
             if group_id == 6577279 and points_to == 'Matt':
                 plus_or_minus = '++'
+
+            if points_to.lower() == str(bot_name) and plus_or_minus == '--':
+                return 'lol no'
 
             if plus_or_minus == '++':
                 if points_to.lower() == 'chipotle':
@@ -270,12 +289,18 @@ class GroupMeBot(object):
 
             return post_text
 
-    def is_gifme(self, match, text):
+    def is_gifme(self, match, text, sorry=False):
         """
         Response for querying a gif. Uses GiphyAPI.
         :param match: re match groups
         :param text: message text
         """
+        if sorry:
+            try:
+                return gif(tag='sorry')['data']['image_url']
+            except:
+                return ''
+
         query = match.group(1).rstrip()
         sorry = None
 
@@ -440,18 +465,19 @@ class GroupMeBot(object):
         log.info('MATCH: why in "{}".'.format(text))
 
         reasons = [
-            'Because his dinner isn\'t ready',
+            'Because their dinner isn\'t ready',
             'Because someone flushed his poop before he could look at it',
-            'Because he likes Chipotle... and didn\'t even plus plus it',
-            'Because his cat downloaded all of that child porn',
-            'Because he is from Texas',
-            'Because @AT made him do it'
+            'Because they like Chipotle... and didn\'t even plus plus it',
+            # 'Because their cat downloaded all of that child porn',
+            'Because they\'re from Texas',
+            'Because @AT made them do it'
         ]
 
         post_text = random.choice(reasons)
 
         return post_text
 
+    ''' DEPRECATED NOW THAT ELECTION IS OVER
     def is_forecast(self, text):
         """
         Gets election forecast from 538. Scraping isn't very robust.
@@ -491,6 +517,51 @@ class GroupMeBot(object):
             post_text += '\n{}: {}%'.format(k, v)
 
         post_text += '\n\nsource: http://projects.fivethirtyeight.com/2016-election-forecast/'
+
+        return '#toosoon'
+    '''
+
+    def is_forecast(self, match, text):
+        """
+        Gets forecast from DarkSky API.
+
+        :param text:
+        :return:
+        """
+        log.info('MATCH: forecast in "{}".'.format(text))
+
+        query = match.group(1).strip()
+
+        api_key = os.environ.get('FORECAST_KEY', None)
+
+        if len(query) == 0:
+            query = 'Portland, OR'
+        elif 'election' in query:
+            return '#toosoon'
+
+        geo = Nominatim().geocode(query)
+        if geo is None:
+            return 'Sorry, location not found.'
+
+        loc = (geo.latitude, geo.longitude)
+
+        f = forecast(api_key, loc[0], loc[1], units='us')
+
+        # summary of the days weather
+        summary = f.hourly().summary
+        summary = summary + ' '
+
+        # specific details for the next hour
+        temp = int(f.hourly().data[0].temperature)
+        temp = str(temp) + ' °F, '
+
+        rain = int(f.hourly().data[0].precipProbability * 100)
+        rain = str(rain) + ' % chance of rain, '
+
+        wind = f.hourly().data[0].windSpeed
+        wind = str(wind) + ' mph wind for the next hour.'
+
+        post_text = summary + temp + rain + wind
 
         return post_text
 
@@ -650,9 +721,67 @@ class GroupMeBot(object):
 
         return post_text
 
+    def setup_markovs(self):
+        """
+        Creates dict of markov generators
+        """
+        group_ids = list(map(int, [bot.group_id for bot in Bot.list()]))
+
+        # make dict of all messages for each group
+        self.markovs = {}
+
+        log.info('Generating markovs.')
+        for group_id in group_ids:
+            messages = Group.list().filter(group_id=str(group_id))[0].messages()
+            while messages.iolder():
+                pass
+
+            corpus = io.StringIO()
+            for m in messages:
+                corpus.write(str(m.text).strip() + '\n\n')
+
+            text_model = markovify.NewlineText(corpus.getvalue())
+            self.markovs[group_id] = text_model
+
+        log.info('Markovs generated.')
+
+    def is_markov(self, match, text, group_id):
+        """
+        Generates a random markov chain from appropriate group.
+
+        :param group_id:
+        :return:
+        """
+        log.info('MATCH: markov in "{}".'.format(text))
+        query = match.group(1)
+
+        if match.group(1) is not None:
+            try:
+                log.info('Making markov chain with start.')
+                post_text = self.markovs[group_id].make_sentence_with_start(
+                    query.strip())
+                if post_text is None:
+                    raise KeyError
+                log.info('Chain made: {}'.format(post_text))
+            except KeyError:
+                log.info('Failed at making chain, returning sorry.')
+
+                post_text = 'Couldn\'t make chain, sorry.'
+                sorry = self.is_gifme(None, None, True)
+
+                post_text = [post_text, sorry]
+
+        else:
+            log.info('Making random markov chain.')
+            post_text = self.markovs[group_id].make_short_sentence(140)
+            log.info('Chain made: {}'.format(post_text))
+
+        return post_text
+
     def is_new_user(self, match, group_id):
         """
         Response to new user. Welcomes them and adds them to db.
+
         :param match: re match groups
         """
         user_name = match.group(2)
@@ -1099,7 +1228,7 @@ def start():
     global gif
     gif = giphy.random
 
-    # init callbacks, must be last call of start()
+    # init callbacks
     server.setup()
 
 if __name__ == '__main__':
