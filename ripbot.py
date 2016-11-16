@@ -44,7 +44,6 @@ class GroupMeBot(object):
     """
     def __init__(self, bots):
         self.bots = bots
-        log.info('Ripbot up and running.')
 
         self.cal_service = self.setup_calservice()
         # self.setup_markovs()
@@ -1232,6 +1231,8 @@ def start():
 
     # do long thing: setup markovs
     bot.setup_markovs()
+
+    log.info('Ripbot up and ready.')
 
 if __name__ == '__main__':
     start()
