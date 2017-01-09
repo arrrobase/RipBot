@@ -150,6 +150,10 @@ class GroupMeBot(object):
                     '^(?:@)?(?:{} )?bottomscores$'.format(bot_name),
                     text, re.IGNORECASE)
 
+                help = re.match(
+                    '^(?:@)?(?:{} )?help'.format(bot_name),
+                    text, re.IGNORECASE)
+
                 who = re.match(
                     '^(?:@)?(?:{} )who'.format(bot_name),
                     text, re.IGNORECASE)
@@ -195,6 +199,9 @@ class GroupMeBot(object):
 
                 elif bottom_scores is not None:
                     post = self.is_scores(text, group_id, False)
+
+                elif help is not None:
+                    post = self.is_help(text)
 
                 elif who is not None:
                     post = self.is_who(text, group_id)
@@ -441,6 +448,25 @@ class GroupMeBot(object):
                 post_text += 's'
 
         return post_text
+
+    def is_help(self, text):
+        """
+        Response to asking for help. Returns list of commands.
+        :param text:
+        :return:
+        """
+        post_text = 'Possible commands (bracket denotes optional):'
+        post_text += '\n[@]something ++|-- [reason]'
+        post_text += '\n[[@]botname] gifme giphy search terms'
+        post_text += '\n[[@]botname] imageme google images search terms'
+        post_text += '\n[[@]botname] youtube|yt search terms'
+        post_text += '\n[[@]botname] topscores|bottomscores'
+        post_text += '\n[@]botname who|why question'
+        post_text += '\n[@]botname when|where calendar query (need ' \
+                     'associated calendar)'
+        post_text += '\n[[@]botname] agenda [int]'
+        post_text += '\n[[@]botname] forecast [location]'
+        post_text += '\n[[@]botname] markov [single start word (case sensitive)]'
 
     def is_who(self, text, group_id):
         """
