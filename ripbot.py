@@ -46,7 +46,8 @@ class GroupMeBot(object):
         self.bots = bots
 
         self.cal_service = self.setup_calservice()
-        self.setup_markovs()
+        self.markovs = None
+        # self.setup_markovs()
 
         log.info('Ripbot up and ready.')
 
@@ -754,6 +755,9 @@ class GroupMeBot(object):
         """
         log.info('MATCH: markov in "{}".'.format(text))
         query = match.group(1)
+
+        if self.markovs is None:
+            self.setup_markovs()
 
         if match.group(1) is not None:
             try:
