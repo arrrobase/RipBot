@@ -151,7 +151,7 @@ class GroupMeBot(object):
                     text, re.IGNORECASE)
 
                 help = re.match(
-                    '^(?:@)?(?:{} )?help'.format(bot_name),
+                    '^(?:@)?(?:{} )?help$'.format(bot_name),
                     text, re.IGNORECASE)
 
                 who = re.match(
