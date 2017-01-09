@@ -757,6 +757,7 @@ class GroupMeBot(object):
         query = match.group(1)
 
         if self.markovs is None:
+            self.post(group_id, 'Making markov generator, could take up to 1 min. Ask me again in a sec.')
             self.setup_markovs()
 
         if match.group(1) is not None:
