@@ -468,6 +468,8 @@ class GroupMeBot(object):
         post_text += '\n[[@]botname] forecast [location]'
         post_text += '\n[[@]botname] markov [single start word (case sensitive)]'
 
+        return post_text
+
     def is_who(self, text, group_id):
         """
         Response for asking ripbot who.
