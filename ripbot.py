@@ -430,7 +430,7 @@ class GroupMeBot(object):
             post_text = '>Top 10 scores:\n'
         else:
             top_scores = db.get_scores(group_id, False)
-            post_text = '>Bottom 10 scores:\n'
+            post_text = '>Top 10 golf scores:\n'
 
         for i, score in enumerate(top_scores):
             post_text += '\n{}. '.format(i+1)
