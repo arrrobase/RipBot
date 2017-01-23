@@ -116,114 +116,119 @@ class GroupMeBot(object):
                 if name_change is not None:
                     post = self.is_name_change(name_change, group_id)
 
-        # non system messages not originating from ripbot
-        elif name is not None and str(name) != str(bot_name):
+        # non system messages
+        elif name is not None:
+
             log.info('BOT: Got message, parsing: "{}"'.format(text))
 
             if text is not None:
 
-                # matches string in format: '@First Last ++ more text'
-                plus_minus = re.match(
-                    '^(.*?)(\+\+|\-\-)(.*)', text)
-
+                # bot can gifme itself
                 gifme = re.match(
                     '^(?:@)?(?:{})?(?: )?gif(?: )?(?:me)? (.*)'.format(bot_name),
                     text, re.IGNORECASE)
 
-                imageme = re.match(
-                    '^(?:@)?(?:{})?(?: )?image(?: )?(?:me)? (.*)'.format(bot_name),
-                    text, re.IGNORECASE)
-
-                animateme = re.match(
-                    '^(?:@)?(?:{})?(?: )?animate(?: )?(?:me)? (.*)'.format(bot_name),
-                    text, re.IGNORECASE)
-
-                youtube = re.match(
-                    '^(?:@)?(?:{})?(?: )?(?:youtube|yt)(?: )?(?:me)? (.*)'.format(bot_name),
-                    text, re.IGNORECASE)
-
-                top_scores = re.match(
-                    '^(?:@)?(?:{} )?topscores$'.format(bot_name),
-                    text, re.IGNORECASE)
-
-                bottom_scores = re.match(
-                    '^(?:@)?(?:{} )?bottomscores$'.format(bot_name),
-                    text, re.IGNORECASE)
-
-                help = re.match(
-                    '^(?:@)?(?:{} )?help$'.format(bot_name),
-                    text, re.IGNORECASE)
-
-                who = re.match(
-                    '^(?:@)?(?:{} )who'.format(bot_name),
-                    text, re.IGNORECASE)
-
-                why = re.match(
-                    '^(?:@)?(?:{} )why'.format(bot_name),
-                    text, re.IGNORECASE)
-
-                when_where = re.match(
-                    '^(?:@)?(?:{} )(?:when|where)(?: is|\'s)(?: the)?(?: next)? (.*)'.format(bot_name),
-                    text, re.IGNORECASE)
-
-                agenda = re.match(
-                    '^(?:@)?(?:{} )?agenda(?: )?(\d)?$'.format(bot_name),
-                    text, re.IGNORECASE)
-
-                forecast = re.match(
-                    # '^(?:@)?(?:{} )?forecast$'.format(bot_name),  # elections
-                    r'^(?:@)?(?:{}\b)?(?: )?forecast\b(.*)?'.format(bot_name),  # weather
-                    text, re.IGNORECASE)
-
-                markov = re.match(
-                    r'^(?:@)?(?:{}\b)?(?: )?markov( \S+)?$'.format(bot_name),
-                    text, re.IGNORECASE)
-
-                if plus_minus is not None:
-                    post = self.is_plusminus(plus_minus, text, group_id, bot_name)
-
-                elif gifme is not None:
+                if gifme is not None:
                     post = self.is_gifme(gifme, text)
 
-                elif imageme is not None:
-                    post = self.is_imageme(imageme, text)
+                # not originating from ripbot
+                if str(name) != str(bot_name):
 
-                elif animateme is not None:
-                    post = self.is_imageme(animateme, text, True)
+                        # matches string in format: '@First Last ++ more text'
+                        plus_minus = re.match(
+                            '^(.*?)(\+\+|\-\-)(.*)', text)
 
-                elif youtube is not None:
-                    post = self.is_youtube(youtube, text)
+                        imageme = re.match(
+                            '^(?:@)?(?:{})?(?: )?image(?: )?(?:me)? (.*)'.format(bot_name),
+                            text, re.IGNORECASE)
 
-                elif top_scores is not None:
-                    post = self.is_scores(text, group_id)
+                        animateme = re.match(
+                            '^(?:@)?(?:{})?(?: )?animate(?: )?(?:me)? (.*)'.format(bot_name),
+                            text, re.IGNORECASE)
 
-                elif bottom_scores is not None:
-                    post = self.is_scores(text, group_id, False)
+                        youtube = re.match(
+                            '^(?:@)?(?:{})?(?: )?(?:youtube|yt)(?: )?(?:me)? (.*)'.format(bot_name),
+                            text, re.IGNORECASE)
 
-                elif help is not None:
-                    post = self.is_help(text)
+                        top_scores = re.match(
+                            '^(?:@)?(?:{} )?topscores$'.format(bot_name),
+                            text, re.IGNORECASE)
 
-                elif who is not None:
-                    post = self.is_who(text, group_id)
+                        bottom_scores = re.match(
+                            '^(?:@)?(?:{} )?bottomscores$'.format(bot_name),
+                            text, re.IGNORECASE)
 
-                elif why is not None:
-                    post = self.is_why(text)
+                        help = re.match(
+                            '^(?:@)?(?:{} )?help$'.format(bot_name),
+                            text, re.IGNORECASE)
 
-                elif when_where is not None:
-                    if str(bot_name) in ['test-ripbot', 'ripbot', 'krom']:
-                        post = self.is_when_where(when_where, text,
-                                                  str(bot_name))
+                        who = re.match(
+                            '^(?:@)?(?:{} )who'.format(bot_name),
+                            text, re.IGNORECASE)
 
-                elif agenda is not None:
-                    if str(bot_name) in ['test-ripbot', 'ripbot', 'krom']:
-                        post = self.is_agenda(agenda, text,
-                                              str(bot_name))
+                        why = re.match(
+                            '^(?:@)?(?:{} )why'.format(bot_name),
+                            text, re.IGNORECASE)
 
-                elif forecast is not None:
-                    post = self.is_forecast(forecast, text)
+                        when_where = re.match(
+                            '^(?:@)?(?:{} )(?:when|where)(?: is|\'s)(?: the)?(?: next)? (.*)'.format(bot_name),
+                            text, re.IGNORECASE)
 
-                elif markov is not None:
-                    post = self.is_markov(markov, text, group_id)
+                        agenda = re.match(
+                            '^(?:@)?(?:{} )?agenda(?: )?(\d)?$'.format(bot_name),
+                            text, re.IGNORECASE)
+
+                        forecast = re.match(
+                            # '^(?:@)?(?:{} )?forecast$'.format(bot_name),  # elections
+                            r'^(?:@)?(?:{}\b)?(?: )?forecast\b(.*)?'.format(bot_name),  # weather
+                            text, re.IGNORECASE)
+
+                        markov = re.match(
+                            r'^(?:@)?(?:{}\b)?(?: )?markov( \S+)?$'.format(bot_name),
+                            text, re.IGNORECASE)
+
+                        if plus_minus is not None:
+                            post = self.is_plusminus(plus_minus, text, group_id, bot_name)
+
+                        elif imageme is not None:
+                            post = self.is_imageme(imageme, text)
+
+                        elif animateme is not None:
+                            post = self.is_imageme(animateme, text, True)
+
+                        elif youtube is not None:
+                            post = self.is_youtube(youtube, text)
+
+                        elif top_scores is not None:
+                            post = self.is_scores(text, group_id)
+
+                        elif bottom_scores is not None:
+                            post = self.is_scores(text, group_id, False)
+
+                        elif help is not None:
+                            post = self.is_help(text)
+
+                        elif who is not None:
+                            post = self.is_who(text, group_id)
+
+                        elif why is not None:
+                            post = self.is_why(text)
+
+                        elif when_where is not None:
+                            if str(bot_name) in ['test-ripbot', 'ripbot', 'krom']:
+                                post = self.is_when_where(when_where, text,
+                                                          str(bot_name))
+
+                        elif agenda is not None:
+                            if str(bot_name) in ['test-ripbot', 'ripbot', 'krom']:
+                                post = self.is_agenda(agenda, text,
+                                                      str(bot_name))
+
+                        elif forecast is not None:
+                            post = self.is_forecast(forecast, text)
+
+                        elif markov is not None:
+                            post = self.is_markov(markov, text, group_id)
 
         if post is not None:
             self.post(group_id, post)
