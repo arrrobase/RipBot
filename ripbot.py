@@ -37,6 +37,23 @@ import os
 import re
 import io
 
+# API keys are stored as environment variables in Heroku
+
+# REQUIRED API KEYS
+# GroupMe: GROUPY_KEY
+# Postgres: DATABASE_URL (provided by Heroku)
+# Port: PORT (provided by Heroku)
+
+# OPTIONAL API KEYS
+# Google search: CUSTOM_SEARCH_ID
+# Google search: CUSTOM_SEARCH_KEY
+# Dark Sky (forecast.io): FORECAST_KEY
+# Google calendar id and key (not env var, in calendar code)
+
+HAVE_GOOGLE_KEY = True
+HAVE_FORECAST_KEY = True
+HAVE_CALENDAR_KEY = True
+
 
 class GroupMeBot(object):
     """
@@ -191,13 +208,16 @@ class GroupMeBot(object):
                             post = self.is_plusminus(plus_minus, text, group_id, bot_name)
 
                         elif imageme is not None:
-                            post = self.is_imageme(imageme, text)
+                            if HAVE_GOOGLE_KEY:
+                                post = self.is_imageme(imageme, text)
 
                         elif animateme is not None:
-                            post = self.is_imageme(animateme, text, True)
+                            if HAVE_GOOGLE_KEY:
+                                post = self.is_imageme(animateme, text, True)
 
                         elif youtube is not None:
-                            post = self.is_youtube(youtube, text)
+                            if HAVE_GOOGLE_KEY:
+                                post = self.is_youtube(youtube, text)
 
                         elif top_scores is not None:
                             post = self.is_scores(text, group_id)
@@ -215,17 +235,20 @@ class GroupMeBot(object):
                             post = self.is_why(text)
 
                         elif when_where is not None:
-                            if str(bot_name) in ['test-ripbot', 'ripbot', 'krom']:
-                                post = self.is_when_where(when_where, text,
-                                                          str(bot_name))
+                            if HAVE_CALENDAR_KEY:
+                                if str(bot_name) in ['test-ripbot', 'ripbot', 'krom']:
+                                    post = self.is_when_where(when_where, text,
+                                                              str(bot_name))
 
                         elif agenda is not None:
-                            if str(bot_name) in ['test-ripbot', 'ripbot', 'krom']:
-                                post = self.is_agenda(agenda, text,
-                                                      str(bot_name))
+                            if HAVE_CALENDAR_KEY:
+                                if str(bot_name) in ['test-ripbot', 'ripbot', 'krom']:
+                                    post = self.is_agenda(agenda, text,
+                                                          str(bot_name))
 
                         elif forecast is not None:
-                            post = self.is_forecast(forecast, text)
+                            if HAVE_FORECAST_KEY:
+                                post = self.is_forecast(forecast, text)
 
                         elif markov is not None:
                             post = self.is_markov(markov, text, group_id)
