@@ -740,14 +740,19 @@ class GroupMeBot(object):
 
             for event in events:
                 where = 'TBD'
-
                 what = event['summary']
-                when = event['start']['dateTime']
+
+                try:
+                    when = event['start']['dateTime']
+                    dt = dateutil.parser.parse(when)
+                    when = dt.strftime('%a. %b. %d at %I:%M %p')
+                except KeyError:
+                    when = event['start']['date']
+                    dt = dateutil.parser.parse(when)
+                    when = dt.strftime('%a. %b. %d')
+
                 if 'location' in event:
                     where = event['location']
-
-                dt = dateutil.parser.parse(when)
-                when = dt.strftime('%a. %b. %d at %I:%M %p')
 
                 post_text += what
                 post_text += '\nlocation: {}'.format(where)
