@@ -283,7 +283,7 @@ class GroupMeBot(object):
         :param group_id: group id
         :param name: name of whoever is assigning points
         """
-        print('##########' + str(name))
+        log.info('##########' + str(name))
 
         plus_or_minus = match.group(2)
         points_to = match.group(1).strip()
