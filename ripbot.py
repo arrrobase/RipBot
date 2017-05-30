@@ -205,7 +205,7 @@ class GroupMeBot(object):
                             text, re.IGNORECASE)
 
                         if plus_minus is not None:
-                            post = self.is_plusminus(plus_minus, text, group_id, bot_name)
+                            post = self.is_plusminus(plus_minus, text, group_id, bot_name, name)
 
                         elif imageme is not None:
                             if HAVE_GOOGLE_KEY:
@@ -275,12 +275,16 @@ class GroupMeBot(object):
             for message in to_post:
                 post(message)
 
-    def is_plusminus(self, match, text, group_id, bot_name):
+    def is_plusminus(self, match, text, group_id, bot_name, name):
         """
         Response for adding/subtracting points
         :param match: re match groups
         :param text: message text
+        :param group_id: group id
+        :param name: name of whoever is assigning points
         """
+        print('##########' + str(name))
+
         plus_or_minus = match.group(2)
         points_to = match.group(1).strip()
         points_to = points_to.lstrip('@')
