@@ -283,8 +283,6 @@ class GroupMeBot(object):
         :param group_id: group id
         :param name: name of whoever is assigning points
         """
-        log.info('##########' + str(name))
-
         plus_or_minus = match.group(2)
         points_to = match.group(1).strip()
         points_to = points_to.lstrip('@')
@@ -292,6 +290,8 @@ class GroupMeBot(object):
         what_for = match.group(3).strip()
         what_for = re.sub(r"^(for|because|cause|cuz)", '', what_for).lstrip()
         what_for = what_for.rstrip('.!?')
+
+        post_text = ''
 
         if type(points_to) == int or len(points_to) > 0:
             log.info('MATCH: plusminus to {} in "{}".'.format(points_to,
@@ -301,7 +301,9 @@ class GroupMeBot(object):
                 plus_or_minus = '++'
 
             if points_to.lower() == str(bot_name) and plus_or_minus == '--':
-                return 'lol no'
+                post_text += 'No, you. '
+                plus_or_minus = '--'
+                points_to = str(name)
 
             if plus_or_minus == '++':
                 if points_to.lower() == 'chipotle':
@@ -315,7 +317,7 @@ class GroupMeBot(object):
                 else:
                     points = db.sub_point(points_to, group_id)
 
-            post_text = '{} now has {} point'
+            post_text += '{} now has {} point'
 
             if points != 1:
                 post_text += 's'
