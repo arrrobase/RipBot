@@ -13,6 +13,7 @@ from safygiphy import Giphy
 import logging
 import signal
 import requests
+from string import punctuation
 
 # google cal search import
 from oauth2client.service_account import ServiceAccountCredentials
@@ -284,7 +285,8 @@ class GroupMeBot(object):
         :param name: name of whoever is assigning points
         """
         plus_or_minus = match.group(2)
-        points_to = re.split('\W+', match.group(1).strip())[-1].strip()
+        # split along punctuation characters
+        points_to = re.split(r'[{}]+'.format(re.escape(punctuation)), match.group(1).strip())[-1].strip()
         points_to = points_to.lstrip('@')
 
         what_for = match.group(3).strip()
