@@ -302,10 +302,10 @@ class GroupMeBot(object):
 
             if points_to.lower() == str(bot_name) and plus_or_minus == '--':
                 log.info('Attempted to downvote bot. Not allowing.')
-                post_text += 'No, you. '
+                post_text += 'Lol no. @'
                 plus_or_minus = '--'
                 points_to = str(name)
-                what_for = 'not knowing who\'s boss.'
+                what_for = 'not knowing who\'s boss'
 
             if plus_or_minus == '++':
                 if points_to.lower() == 'chipotle':
