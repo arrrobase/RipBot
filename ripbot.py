@@ -284,7 +284,7 @@ class GroupMeBot(object):
         :param name: name of whoever is assigning points
         """
         plus_or_minus = match.group(2)
-        points_to = match.group(1).strip()
+        points_to = match.group(1).strip().split('.')[-1].strip()
         points_to = points_to.lstrip('@')
 
         what_for = match.group(3).strip()
