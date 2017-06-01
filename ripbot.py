@@ -825,7 +825,7 @@ class GroupMeBot(object):
         :return:
         """
         log.info('MATCH: markov in "{}".'.format(text))
-        query = match.group(1)
+        query = match.group(1).strip()
 
         if self.markovs is None:
             self.post(group_id, 'Making markov generator, could take up to 1 min. I\'ll let you know.')
@@ -833,14 +833,24 @@ class GroupMeBot(object):
             return 'Markovs ready.'
 
         if match.group(1) is not None:
+            # try once, if fails then try capitalizing, else give up.
             try:
-                log.info('Making markov chain with start.')
-                post_text = self.markovs[group_id].make_sentence_with_start(
-                    query.strip())
-                if post_text is None:
-                    raise KeyError
-                log.info('Chain made: {}'.format(post_text))
-            except KeyError:
+                try:
+                    log.info('Making markov chain with start.')
+                    post_text = self.markovs[group_id].make_sentence_with_start(
+                        query)
+                    if post_text is None:
+                        raise KeyError
+                    log.info('Chain made: {}'.format(post_text))
+
+                except KeyError:
+                    query = query.capitalize()
+                    post_text = self.markovs[group_id].make_sentence_with_start(
+                        query)
+                    if post_text is None:
+                        raise ValueError
+
+            except ValueError:
                 log.info('Failed at making chain, returning sorry.')
 
                 post_text = 'Couldn\'t make chain, sorry.'
