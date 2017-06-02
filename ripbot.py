@@ -893,7 +893,7 @@ class GroupMeBot(object):
         """
         post_text = '@all ^'
 
-        group = Group.list().filter(group_id=group_id)[0]
+        group = Group.list().filter(group_id=str(group_id))[0]
 
         ids = list(map(lambda x: str(x.user_id), group.members()))
         loci = [[1, 4]] * len(ids)
