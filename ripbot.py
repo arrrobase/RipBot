@@ -7,7 +7,7 @@ Groupme bot running on Heroku.
 
 from __future__ import print_function
 
-from groupy import Bot, Group, config
+from groupy import Bot, Group, config, attachments
 from flask import Flask, request
 from safygiphy import Giphy
 import logging
@@ -119,6 +119,7 @@ class GroupMeBot(object):
             return
 
         post = None
+        attachment = None
 
         # check if system message
         if system:
@@ -205,6 +206,10 @@ class GroupMeBot(object):
                             r'^(?:@)?(?:{}\b)?(?: )?markov( \S+)?$'.format(bot_name),
                             text, re.IGNORECASE)
 
+                        at_all = re.match(
+                            r'@all',
+                            text, re.IGNORECASE)
+
                         if plus_minus is not None:
                             post = self.is_plusminus(plus_minus, text, group_id, bot_name, name)
 
@@ -254,13 +259,16 @@ class GroupMeBot(object):
                         elif markov is not None:
                             post = self.is_markov(markov, text, group_id)
 
+                        elif at_all is not None:
+                            post, attachment = self.is_at_all(group_id)
+
         if post is not None:
-            self.post(group_id, post)
+            self.post(group_id, post, attachment)
 
         else:
             log.info('No matches; ignoring.')
 
-    def post(self, group_id, to_post):
+    def post(self, group_id, to_post, attachments):
         """
         Posts to proper group.
 
@@ -269,12 +277,21 @@ class GroupMeBot(object):
         """
         post = self.bots[group_id]['post']
 
-        try:
-            post(to_post)
+        if attachments is None:
+            try:
+                post(to_post)
 
-        except (TypeError, AttributeError):
-            for message in to_post:
-                post(message)
+            except (TypeError, AttributeError):
+                for message in to_post:
+                    post(message)
+
+        else:
+            try:
+                post(to_post, attachments)
+
+            except (TypeError, AttributeError):
+                for message, attachment in zip(to_post, attachments):
+                    post(message, attachment)
 
     def is_plusminus(self, match, text, group_id, bot_name, name):
         """
@@ -866,6 +883,25 @@ class GroupMeBot(object):
             log.info('Chain made: {}'.format(post_text))
 
         return post_text
+
+    def is_at_all(self, group_id):
+        """
+        Notifies all members of a group using attachment abuse.
+
+        :param group_id:
+        :return:
+        """
+        post_text = '@all ^'
+
+        group = Group.list().filter(group_id=group_id)[0]
+
+        ids = list(map(lambda x: str(x.user_id), group.members()))
+        loci = [[1, 4]] * len(ids)
+
+        mentions = attachments.Mentions(ids, loci)
+        mentions = mentions.as_dict()
+
+        return post_text, mentions
 
     def is_new_user(self, match, group_id):
         """
