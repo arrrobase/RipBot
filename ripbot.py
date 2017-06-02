@@ -268,7 +268,7 @@ class GroupMeBot(object):
         else:
             log.info('No matches; ignoring.')
 
-    def post(self, group_id, to_post, attachments):
+    def post(self, group_id, to_post, attachments=None):
         """
         Posts to proper group.
 
