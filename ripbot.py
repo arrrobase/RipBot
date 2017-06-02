@@ -286,6 +286,7 @@ class GroupMeBot(object):
                     post(message)
 
         else:
+            log.info('Have attachments, posting with.')
             try:
                 post(to_post, attachments)
 
@@ -891,6 +892,7 @@ class GroupMeBot(object):
         :param group_id:
         :return:
         """
+        log.info('MATCH: @all')
         post_text = '@all ^'
 
         group = Group.list().filter(group_id=str(group_id))[0]
