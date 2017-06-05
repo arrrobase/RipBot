@@ -7,6 +7,7 @@ Groupme bot running on Heroku.
 
 from __future__ import print_function
 
+from groupy import __version__ as groupy_version
 from groupy import Bot, Group, config, attachments
 from flask import Flask, request
 from safygiphy import Giphy
@@ -68,6 +69,7 @@ class GroupMeBot(object):
         # self.setup_markovs()
 
         log.info('Ripbot up and ready.')
+        log.info('GROUPY VERSION: ', groupy_version)
 
         if os.environ.get('IS_TEST', False):
             # post to test
