@@ -1,5 +1,5 @@
 flask
-GroupyAPI
+GroupyAPI==0.7.0
 psycopg2
 safygiphy
 requests
