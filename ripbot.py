@@ -7,7 +7,6 @@ Groupme bot running on Heroku.
 
 from __future__ import print_function
 
-from groupy import __version__ as groupy_version
 from groupy import Bot, Group, config, attachments
 from flask import Flask, request
 from safygiphy import Giphy
@@ -69,7 +68,6 @@ class GroupMeBot(object):
         # self.setup_markovs()
 
         log.info('Ripbot up and ready.')
-        log.info('GROUPY VERSION: ', groupy_version)
 
         if os.environ.get('IS_TEST', False):
             # post to test
@@ -907,10 +905,10 @@ class GroupMeBot(object):
         mentions = attachments.Mentions(ids, loci)
         mentions = mentions.as_dict()
 
-        self.bots[int(group_id)]['post'](post_text, mentions)
-        return None, None
+        # self.bots[int(group_id)]['post'](post_text, mentions)
+        # return None, None
 
-        # return post_text, mentions
+        return post_text, mentions
 
     def is_new_user(self, match, group_id):
         """
