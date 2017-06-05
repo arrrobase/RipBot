@@ -906,8 +906,9 @@ class GroupMeBot(object):
         mentions = mentions.as_dict()
 
         self.bots[int(group_id)]['post'](post_text, mentions)
-
         return None, None
+
+        # return post_text, mentions
 
     def is_new_user(self, match, group_id):
         """
