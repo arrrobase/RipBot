@@ -207,7 +207,7 @@ class GroupMeBot(object):
                             text, re.IGNORECASE)
 
                         at_all = re.match(
-                            r'^.*?\@all',
+                            r'^.*?\@all\b',
                             text, re.IGNORECASE)
 
                         if plus_minus is not None:
@@ -525,6 +525,7 @@ class GroupMeBot(object):
         post_text += '\n[[@]botname] agenda [int]'
         post_text += '\n[[@]botname] forecast [location]'
         post_text += '\n[[@]botname] markov [single start word (case sensitive)]'
+        post_text += '\n@all mention all users'
 
         return post_text
 
