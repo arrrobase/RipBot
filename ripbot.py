@@ -207,7 +207,7 @@ class GroupMeBot(object):
                             text, re.IGNORECASE)
 
                         at_all = re.match(
-                            r'@all',
+                            r'^.*?\@all',
                             text, re.IGNORECASE)
 
                         if plus_minus is not None:
