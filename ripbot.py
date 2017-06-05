@@ -282,6 +282,7 @@ class GroupMeBot(object):
                 post(to_post)
 
             except (TypeError, AttributeError):
+                log.info('Have multiple messages, posting all')
                 for message in to_post:
                     post(message)
 
@@ -291,6 +292,7 @@ class GroupMeBot(object):
                 post(to_post, attachments)
 
             except (TypeError, AttributeError):
+                log.info('Have multiple messages, posting all')
                 for message, attachment in zip(to_post, attachments):
                     post(message, attachment)
 
