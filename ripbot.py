@@ -939,7 +939,7 @@ class GroupMeBot(object):
                9838840]   # KP ++ for shorter id keeping comments lined up
 
         ids = list(map(str, ids))
-        loci = [[1, 4]] * len(ids)
+        loci = [[1, 11]] * len(ids)
 
         mentions = attachments.Mentions(ids, loci)
         mentions = mentions.as_dict()
