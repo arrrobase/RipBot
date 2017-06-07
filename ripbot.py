@@ -210,6 +210,10 @@ class GroupMeBot(object):
                             r'^.*?\@all\b',
                             text, re.IGNORECASE)
 
+                        at_leadership = re.match(
+                            r'^.*?\@leadership\b',
+                            text, re.IGNORECASE)
+
                         if plus_minus is not None:
                             post = self.is_plusminus(plus_minus, text, group_id, bot_name, name)
 
@@ -261,6 +265,9 @@ class GroupMeBot(object):
 
                         elif at_all is not None:
                             post, attachment = self.is_at_all(group_id)
+
+                        elif at_leadership is not None:
+                            post, attachment = self.is_at_leadership(group_id)
 
         if post is not None:
             self.post(group_id, post, attachment)
@@ -904,6 +911,33 @@ class GroupMeBot(object):
         group = Group.list().filter(group_id=str(group_id))[0]
 
         ids = list(map(lambda x: str(x.user_id), group.members()))
+        loci = [[1, 4]] * len(ids)
+
+        mentions = attachments.Mentions(ids, loci)
+        mentions = mentions.as_dict()
+
+        return post_text, mentions
+
+    def is_at_leadership(self, group_id):
+        """
+        Notifies all members of a group using attachment abuse.
+
+        :param group_id:
+        :return:
+        """
+        if group_id != 13678029:
+            return None, None
+
+        log.info('MATCH: @leadership')
+        post_text = '@leadership ^'
+
+        ids = [19577557,  # Touches
+               19837433,  # Austin
+               19385984,  # Blaydong
+               15663495,  # Peach
+               9838840]   # KP ++ for shorter id keeping comments lined up
+
+        ids = list(map(str, ids))
         loci = [[1, 4]] * len(ids)
 
         mentions = attachments.Mentions(ids, loci)
