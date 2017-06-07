@@ -925,7 +925,8 @@ class GroupMeBot(object):
         :param group_id:
         :return:
         """
-        if group_id != 13678029:
+        # only do for rip and test group
+        if group_id not in [13678029, 23373961]:
             return None, None
 
         log.info('MATCH: @leadership')
