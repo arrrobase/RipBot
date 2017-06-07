@@ -353,6 +353,9 @@ class GroupMeBot(object):
                 post_text += '.'
                 post_text = post_text.format(points_to, points)
 
+            if points_to.lower() == 'core' and points == 500:
+                post_text += ' Congrats! You guys did it!'
+            
             return post_text
 
     def is_gifme(self, match, text, sorry=False):
