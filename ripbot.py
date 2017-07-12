@@ -313,7 +313,7 @@ class GroupMeBot(object):
         """
         plus_or_minus = match.group(2)
         # split along punctuation characters
-        ignore = re.sub("['-@/]", '', punctuation)
+        ignore = re.sub("[-'@/]", '', punctuation)
         points_to = re.split(r'[{}]+'.format(re.escape(ignore)), match.group(1).strip())[-1].strip()
         points_to = points_to.lstrip('@')
 
