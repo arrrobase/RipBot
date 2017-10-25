@@ -315,7 +315,12 @@ class GroupMeBot(object):
         # split along punctuation characters
         ignore = re.sub("[-'@/]", '', punctuation)
         points_to = re.split(r'[{}]+'.format(re.escape(ignore)), match.group(1).strip())[-1].strip()
-        points_to = points_to.lstrip('@')
+
+        # special case where name is "@@"
+        if points_to.startswith('@@'):
+            points_to = points_to[1:]
+        else:
+            points_to = points_to.lstrip('@')
 
         what_for = match.group(3).strip()
         what_for = re.sub(r"^(for|because|cause|cuz)", '', what_for).lstrip()
