@@ -921,6 +921,11 @@ class GroupMeBot(object):
         group = Group.list().filter(group_id=str(group_id))[0]
 
         ids = list(map(lambda x: str(x.user_id), group.members()))
+
+        # don't mention me in krom, vitruvibot, or ghost
+        if group_id in [6577279, 10171936, 31241858]:
+            ids.remove(22942080)
+
         loci = [[1, 4]] * len(ids)
 
         mentions = attachments.Mentions(ids, loci)
