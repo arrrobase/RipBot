@@ -942,11 +942,10 @@ class GroupMeBot(object):
         log.info('MATCH: @leadership')
         post_text = '@leadership ^'
 
-        ids = [19577557,  # Touches
-               19837433,  # Austin
-               19385984,  # Blaydong
-               15663495,  # Peach
-               9838840]   # KP ++ for shorter id keeping comments lined up
+        ids = [26742948, # Augirth
+               9197895,  # Kyle
+               24501903, # Fish
+               ]
 
         ids = list(map(str, ids))
         loci = [[1, 11]] * len(ids)
