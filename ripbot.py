@@ -921,7 +921,6 @@ class GroupMeBot(object):
         group = Group.list().filter(group_id=str(group_id))[0]
 
         ids = list(map(lambda x: str(x.user_id), group.members()))
-        print(ids)
 
         # don't mention me in krom, vitruvibot, or ghost
         if group_id in [6577279, 10171936, 31241858]:
