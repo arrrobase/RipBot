@@ -100,7 +100,11 @@ class GroupMeBot(object):
             name = data['name']
 
         if 'text' in data:
-            text = data['text'].strip()
+            text = re.sub(
+                r'^\[.*?\]\s+',
+                '',
+                data['text'].strip(),
+            )
 
         if 'system' in data:
             system = data['system']
