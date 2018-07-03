@@ -540,6 +540,7 @@ class GroupMeBot(object):
         post_text = 'Possible commands (bracket denotes optional):'
         post_text += '\n[@]something ++|-- [reason]'
         post_text += '\n[[@]botname] gifme giphy search terms'
+        post_text += '\n[[@]botname] animateme google gif search terms'
         post_text += '\n[[@]botname] imageme google images search terms'
         post_text += '\n[[@]botname] youtube|yt search terms'
         post_text += '\n[[@]botname] topscores|bottomscores'
