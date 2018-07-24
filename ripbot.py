@@ -339,6 +339,9 @@ class GroupMeBot(object):
             if group_id == 6577279 and points_to == 'Matt':
                 plus_or_minus = '++'
 
+            if points_to.lower() == 'me':
+                points_to = str(name)
+
             if points_to.lower() == str(bot_name).lower() and plus_or_minus == '--':
                 log.info('Attempted to downvote bot. Not allowing.')
                 post_text += 'Lol no. @'
