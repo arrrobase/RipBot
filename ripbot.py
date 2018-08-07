@@ -901,7 +901,7 @@ class GroupMeBot(object):
                     if post_text is None:
                         raise ValueError
 
-            except ValueError:
+            except (ValueError, KeyError):
                 log.info('Failed at making chain, returning sorry.')
 
                 post_text = 'Couldn\'t make chain, sorry.'
