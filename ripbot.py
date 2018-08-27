@@ -159,7 +159,7 @@ class GroupMeBot(object):
 
                         # matches string in format: '@First Last ++ more text'
                         plus_minus = re.match(
-                            '^(.*?)(\+\+|\-\-)(.*)', text, re.DOTALL | re.MULTILINE)
+                            '^(.*?)(\+\+|\-\-)(.*)', text, re.MULTILINE)
 
                         imageme = re.match(
                             '^(?:@)?(?:{})?(?: )?image(?: )?(?:me)? (.*)'.format(bot_name),
