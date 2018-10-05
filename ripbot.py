@@ -565,7 +565,7 @@ class GroupMeBot(object):
 
         member = Group.list().filter(group_id=str(group_id))[0].members()
 
-        intro = ['Signs Point to ',
+        intro = ['Signs point to ',
                  'Looks like ',
                  'Winner is ',
                  'I think it was ']
