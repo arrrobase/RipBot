@@ -985,9 +985,11 @@ class GroupMeBot(object):
         member = Group.list().filter(group_id=str(group_id))[0].members(
             ).filter(nickname=user_name)[0]
         user_id = int(member.user_id)
+        log.info('NEW USER USER ID: {}'.format(user_id))
 
         # check if user already in DB
         if not db.exists(user_id, group_id):
+            log.info('NEW USER "{}" not found in DB, adding.'.format(user_id))
             db.add_player(user_id, user_name, group_id)
 
         points = db.get_player_points(user_id, group_id)
