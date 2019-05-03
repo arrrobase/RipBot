@@ -1421,7 +1421,9 @@ def start():
     db = Database(group_ids)
 
     # initialize giphy
-    giphy = Giphy()
+    giphy_key = os.environ['GIPHY_KEY']
+
+    giphy = Giphy(token=giphy_key)
     global gif
     gif = giphy.random
 
