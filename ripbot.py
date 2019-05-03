@@ -388,11 +388,14 @@ class GroupMeBot(object):
         :param match: re match groups
         :param text: message text
         """
-        if sorry:
+        def sorry_gif():
             try:
                 return gif(tag='sorry')['data']['image_url']
             except:
                 return ''
+
+        if sorry:
+            return sorry_gif()
 
         query = match.group(1).rstrip()
         sorry = None
@@ -401,18 +404,18 @@ class GroupMeBot(object):
             log.info('MATCH: gifme in {}.'.format(text))
 
             try:
-                post_text = gif(tag=query, rating='r')['data']['image_url']
+                gifs = gif(tag=query, rating='r')
+                post_text = gifs['data']['image_url']
 
             except (TypeError, IndexError):
                 post_text = 'Sorry, no gifs matching those tags.'
+                sorry = sorry_gif()
 
-                try:
-                    sorry = gif(tag='sorry')['data']['image_url']
+            except KeyError:
+                if 'message' in gifs and 'limit' in gifs['message']:
+                    return "Rate limit exceed, chill out y'all (talk to AT about upping rate limit."
 
-                except:
-                    pass
-
-            if sorry is not None:
+            if sorry:
                 post_text = [post_text, sorry]
 
             return post_text
