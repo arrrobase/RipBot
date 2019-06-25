@@ -953,17 +953,35 @@ class GroupMeBot(object):
         :param group_id:
         :return:
         """
+        leadership_map = {
+            # test
+            13678029: [
+                26742948,  # Augirth
+                9197895,  # Kyle
+                24501903,  # Fish
+            ],
+            # rip 2018
+            23373961: [
+                26742948,  # Augirth
+                9197895,  # Kyle
+                24501903,  # Fish
+            ],
+            # # admin 2019
+            # 50884034: [
+            #     ,  # Dillon
+            #     ,  # Kamu
+            #     ,  # Andie
+            # ],
+        }
+
         # only do for rip and test group
-        if group_id not in [13678029, 23373961]:
+        if group_id not in leadership_map.keys():
             return None, None
 
         log.info('MATCH: @leadership')
         post_text = '@leadership ^'
 
-        ids = [26742948, # Augirth
-               9197895,  # Kyle
-               24501903, # Fish
-               ]
+        ids = leadership_map[group_id]
 
         ids = list(map(str, ids))
         loci = [[1, 11]] * len(ids)
