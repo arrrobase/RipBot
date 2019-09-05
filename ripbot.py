@@ -956,9 +956,7 @@ class GroupMeBot(object):
         leadership_map = {
             # test
             13678029: [
-                26742948,  # Augirth
-                9197895,  # Kyle
-                24501903,  # Fish
+                22942080,  # AT (me)
             ],
             # rip 2018
             23373961: [
@@ -981,9 +979,7 @@ class GroupMeBot(object):
         log.info('MATCH: @leadership')
         post_text = '@leadership ^'
 
-        ids = leadership_map[group_id]
-
-        ids = list(map(str, ids))
+        ids = list(map(str, leadership_map[group_id]))
         loci = [[1, 11]] * len(ids)
 
         mentions = attachments.Mentions(ids, loci)
@@ -1196,8 +1192,9 @@ class Database(object):
             id = int(member.user_id)
             log.info('GROUPY: Converted name to ID')
 
-        except(TypeError, IndexError):
-            pass
+        except(TypeError, IndexError) as e:
+            log.error('GROUPY: Could not match username to user id with groupy, log below')
+            log.error(e)
 
         if type(id) == int:
             sql = "UPDATE \"{}\" SET points = points + 1 WHERE id={}"
