@@ -1186,15 +1186,14 @@ class Database(object):
         """
         # see if points_to is a person, get groupme ID if so
         try:
-            member = Group.list().filter(
-                group_id=group_id)[0].members().filter(nickname=id)[0]
+            member = Group.list().filter(group_id=str(group_id))[0].members().filter(nickname=id)[0]
 
             id = int(member.user_id)
             log.info('GROUPY: Converted name to ID')
 
         except(TypeError, IndexError) as e:
             log.error('GROUPY: Could not match username to user id with groupy, log below')
-            log.error(e)
+            log.error(str(e))
 
         if type(id) == int:
             sql = "UPDATE \"{}\" SET points = points + 1 WHERE id={}"
